@@ -176,7 +176,7 @@ class general(commands.Cog, name="general"):
             response = await raw_response.text()
             response = json.loads(response)
             embed = discord.Embed(
-                title=":coin: Info",
+                title=":coin: Bitcoin",
                 description=f"Bitcoin price is: ${response['bpi']['USD']['rate']} USD",
                 color=0x00FF00
             )
@@ -194,7 +194,7 @@ class general(commands.Cog, name="general"):
             response = await raw_response.text()
             response = json.loads(response)
             embed = discord.Embed(
-                title=":doge: Info",
+                title="<:doge:805916026310492170> Dogecoin to the moon :rocket:",
                 description=f"Dogecoin price is: ${response['data']['prices'][0]['price']} USD",
                 color=0x00FF00
             )
