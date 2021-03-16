@@ -101,7 +101,7 @@ class general(commands.Cog, name="general"):
         )
         embed.add_field(
             name="Pong!",
-            value=":ping_pong:",
+            value=f":ping_pong: server latency {self.bot.latency:.4}s",
             inline=True
         )
         embed.set_footer(
