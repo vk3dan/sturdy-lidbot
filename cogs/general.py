@@ -164,7 +164,7 @@ class general(commands.Cog, name="general"):
         )
         await context.send(embed=embed)
 
-    @commands.command(name="btc")
+    @commands.command(name="btc", aliases=["bitcoin"])
     async def bitcoin(self, context):
         """
         Get the current price of bitcoin in USD.
@@ -176,13 +176,13 @@ class general(commands.Cog, name="general"):
             response = await raw_response.text()
             response = json.loads(response)
             embed = discord.Embed(
-                title=":information_source: Info",
+                title=":coin: Info",
                 description=f"Bitcoin price is: ${response['bpi']['USD']['rate']} USD",
                 color=0x00FF00
             )
             await context.send(embed=embed)
 
-    @commands.command(name="doge")
+    @commands.command(name="doge", aliases=["dogecoin"])
     async def dogecoin(self, context):
         """
         Get the current price of dogecoin in USD *TO THE MOON*.
@@ -194,13 +194,13 @@ class general(commands.Cog, name="general"):
             response = await raw_response.text()
             response = json.loads(response)
             embed = discord.Embed(
-                title=":information_source: Info",
+                title=":doge: Info",
                 description=f"Dogecoin price is: ${response['data']['prices'][0]['price']} USD",
                 color=0x00FF00
             )
             await context.send(embed=embed)
 
-    @commands.command(name="cat")
+    @commands.command(name="cat", aliases=["kitty","neko"])
     async def kitty(self, context):
         """
         Fetch a random cat pic from reddit.
@@ -216,6 +216,24 @@ class general(commands.Cog, name="general"):
                 color=0x00FF00
             )
             embed.set_image(url=response[0]['data']['children'][0]['data']['url'])
+            await context.send(embed=embed)
+
+    @commands.command(name="stonk", aliases=["stock"])
+    async def stonk(self, context, *, args):
+        """
+        Get some info about a stonk from its ticker code.
+        """
+        url = "https://query1.finance.yahoo.com/v7/finance/quote?lang=en-US&region=US&corsDomain=finance.yahoo.com&symbols="+args
+        # Async HTTP request
+        async with aiohttp.ClientSession() as session:
+            raw_response = await session.get(url)
+            response = await raw_response.text()
+            response = json.loads(response)
+            embed = discord.Embed(
+                title=f":money_with_wings: Stonk: {response['quoteResponse']['result'][0]['shortName']}",
+                description=f"{args} market price is: ${response['quoteResponse']['result'][0]['regularMarketPrice']} USD (${response['quoteResponse']['result'][0]['regularMarketChange']} | {response['quoteResponse']['result'][0]['regularMarketChangePercent']}% change)",
+                color=0x00FF00
+            )
             await context.send(embed=embed)
 
 
