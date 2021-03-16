@@ -1,36 +1,19 @@
-# Python Discord Bot Template
-<p align="center">
-  <a href="//discord.gg/HzJ3Gfr"><img src="https://img.shields.io/discord/739934735387721768?logo=discord"></a>
-  <a href="//github.com/kkrypt0nn/Python-Discord-Bot-Template/releases"><img src="https://img.shields.io/github/v/release/kkrypt0nn/Python-Discord-Bot-Template"></a>
-  <a href="//github.com/kkrypt0nn/Python-Discord-Bot-Template/commits/main"><img src="https://img.shields.io/github/last-commit/kkrypt0nn/Python-Discord-Bot-Template"></a>
-  <a href="//github.com/kkrypt0nn/Python-Discord-Bot-Template/releases"><img src="https://img.shields.io/github/downloads/kkrypt0nn/Python-Discord-Bot-Template/total"></a>
-  <a href="//github.com/kkrypt0nn/Python-Discord-Bot-Template/blob/main/LICENSE.md"><img src="https://img.shields.io/github/license/kkrypt0nn/Python-Discord-Bot-Template"></a>
-  <a href="//github.com/kkrypt0nn/Python-Discord-Bot-Template"><img src="https://img.shields.io/github/languages/code-size/kkrypt0nn/Python-Discord-Bot-Template"></a>
-  <a href="//github.com/kkrypt0nn/Python-Discord-Bot-Template/issues"><img src="https://img.shields.io/github/issues-raw/kkrypt0nn/Python-Discord-Bot-Template"></a>
-</p>
+# Python Discord Bot For lids
 
-This repository is a template that everyone can use for the start of their discord bot.
+## Description
+This is a python discord bot for lids, made for use in our private server. It
+was adapted from **[Krypton (@kkrypt0nn)](https://github.com/kkrypt0nn)**'s
+bot template.
 
-When I first started creating my discord bot it took me a while to get everything setup and working with cogs and more. I would've been happy if there were any template existing. But there wasn't any existing template. That's why I decided to create my own template to let <b>you</b> guys create your discord bot in an easy way.
-
-Please note that this template is not supposed to be the best template, but a good template to start learning how discord.py works and to make your own bot in a simple way. You're
-
-If you play to use this template to make your own template or bot, please give me credits, it would be greatly appreciated.
+It has had some features added sofar such as dogecoin price, random cat
+pictures and a couple of ham radio related commands.
 
 ## Authors
-* **[Krypton (@kkrypt0nn)](https://github.com/kkrypt0nn)** - The only and one developer
+* **[vk3dan](https://github.com/vk3dan)** - That's me
+* **[Krypton (@kkrypt0nn)](https://github.com/kkrypt0nn)** - Author of the
+  template used
 
-## Support
-
-If you need some help for something, do not hesitate to join my discord server [here](https://discord.gg/HzJ3Gfr).
-
-All the updates of the template are available [here](UPDATES.md).
-
-## How to download it
-
-This repository is now a template, on the top left you can simple click on "**Use this template**" to create a GitHub repository based on this template.
-
-Alternatively you can do the following:
+To use this you can do the following:
 * Clone/Download the repository
     * To clone it and get the updates you can definitely use the command
     `git clone`
@@ -41,7 +24,7 @@ https://discordapp.com/oauth2/authorize?&client_id=YOUR_APPLICATION_ID_HERE&scop
 
 ## How to setup
 
-To setup the bot I made it as simple as possible. I now created a [config.py](config.py) file where you can put the needed things to edit.
+To setup the bot Krypton made it as simple as possible. he created a [config.py](config.py) file where you can put the needed things to edit.
 
 Here is an explanation of what everything is:
 
@@ -81,23 +64,6 @@ python bot.py
 ## Built With
 
 * [Python 3.8](https://www.python.org/)
-
-## Issues or Questions
-
-If you have any issues or questions of how to code a specific command, you can:
-
-* Join my discord server [here](https://discord.gg/HzJ3Gfr)
-* Post them [here](https://github.com/kkrypt0nn/Python-Discord-Bot-Template/issues)
-
-Me or other people will take their time to answer and help you.
-
-## Versioning
-
-We use [SemVer](http://semver.org) for versioning. For the versions available, see the [tags on this repository](https://github.com/kkrypt0nn/Python-Discord-Bot-Template/tags). 
-
-## Bots who used this template
-
-*DM Krypton#7331 to get yourself in this list*
 
 ## License
 

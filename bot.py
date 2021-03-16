@@ -61,13 +61,13 @@ async def on_ready():
 # Setup the game status task of the bot
 async def status_task():
 	while True:
-		await bot.change_presence(activity=discord.Game("with you!"))
+		await bot.change_presence(activity=discord.Game("like a lid"))
 		await asyncio.sleep(60)
-		await bot.change_presence(activity=discord.Game("with Krypton!"))
+		await bot.change_presence(activity=discord.Game("with a baofeng"))
 		await asyncio.sleep(60)
-		await bot.change_presence(activity=discord.Game(f"{config.BOT_PREFIX} help"))
+		await bot.change_presence(activity=discord.Game(f"with myself"))
 		await asyncio.sleep(60)
-		await bot.change_presence(activity=discord.Game("with humans!"))
+		await bot.change_presence(activity=discord.Game("with my ding ding"))
 		await asyncio.sleep(60)
 
 # Removes the default help command of discord.py to be able to create our custom help command.
