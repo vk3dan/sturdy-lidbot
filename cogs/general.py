@@ -233,14 +233,14 @@ class general(commands.Cog, name="general"):
             regularMarketChange = round(float(f"{response['quoteResponse']['result'][0]['regularMarketChange']}"),2)
             regularMarketChangePercent = round(float(f"{response['quoteResponse']['result'][0]['regularMarketChangePercent']}"),2)
             if regularMarketChange < 0:
-                directionEmoji = ":red_square:"
+                directionEmoji = "<:red_arrow_down:821559140345315348>"
             elif regularMarketChange > 0:
-                directionEmoji = ":green_square:"
+                directionEmoji = "<:green_arrow_up:821559109031559179>"
             else:
-                directionEmoji = ":blue_square:"
+                directionEmoji = ":sleeping:"
             embed = discord.Embed(
                 title=f":money_with_wings: Stonk: {response['quoteResponse']['result'][0]['displayName']} ({response['quoteResponse']['result'][0]['fullExchangeName']})",
-                description=f"{args} market price is: {regularMarketPrice} USD ( {directionEmoji} ${regularMarketChange} | {regularMarketChangePercent}% change )",
+                description=f"{response['quoteResponse']['result'][0]['symbol']} market price is: {regularMarketPrice} USD ( {directionEmoji} ${regularMarketChange} | {regularMarketChangePercent}% change )",
                 color=0x00FF00
             )
             await context.send(embed=embed)
