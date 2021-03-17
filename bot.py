@@ -1,6 +1,13 @@
 """"
-Copyright © Krypton 2021 - https://github.com/kkrypt0nn
+Copyright vk3dan 2021
 Description:
+This is lidbot, a bot for lids.
+It has some fairly basic features, some from the template used, and
+some written by myself, with some more hopefully coming soon.
+
+
+Template used Copyright © Krypton 2021 - https://github.com/kkrypt0nn
+Description from template:
 This is a template to create your own discord bot in python.
 
 Version: 2.3
