@@ -65,9 +65,15 @@ async def status_task():
 		await asyncio.sleep(60)
 		await bot.change_presence(activity=discord.Game("with a baofeng"))
 		await asyncio.sleep(60)
-		await bot.change_presence(activity=discord.Game(f"with myself"))
+		await bot.change_presence(activity=discord.Game("with myself"))
 		await asyncio.sleep(60)
 		await bot.change_presence(activity=discord.Game("with my ding ding"))
+		await asyncio.sleep(60)
+		await bot.change_presence(activity=discord.Game("you"))
+		await asyncio.sleep(60)
+		await bot.change_presence(activity=discord.Game("myself"))
+		await asyncio.sleep(60)
+		await bot.change_presence(activity=discord.Game("with fireworks in garage"))
 		await asyncio.sleep(60)
 
 # Removes the default help command of discord.py to be able to create our custom help command.
