@@ -1,4 +1,4 @@
-import os, sys, discord, platform, random, aiohttp, json
+import os, sys, discord, platform, random, aiohttp, json, re
 from discord.ext import commands
 if not os.path.isfile("config.py"):
     sys.exit("'config.py' not found! Please add it and try again.")
@@ -223,7 +223,8 @@ class general(commands.Cog, name="general"):
         """
         Get some info about a stonk from its ticker code.
         """
-        url = "https://query1.finance.yahoo.com/v7/finance/quote?lang=en-US&region=US&corsDomain=finance.yahoo.com&symbols="+args
+        cleanargs=re.sub(r'[^a-zA-Z0-9]','', args)
+        url = "https://query1.finance.yahoo.com/v7/finance/quote?lang=en-US&region=US&corsDomain=finance.yahoo.com&symbols="+cleanargs
         # Async HTTP request
         async with aiohttp.ClientSession() as session:
             raw_response = await session.get(url)
