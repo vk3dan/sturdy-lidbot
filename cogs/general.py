@@ -109,6 +109,24 @@ class general(commands.Cog, name="general"):
         )
         await context.send(embed=embed)
 
+    @commands.command(name="ding")
+    async def ding(self, context):
+        """
+        Check if the dong is alive.
+        """
+        embed = discord.Embed(
+            color=0x00FF00
+        )
+        embed.add_field(
+            name="Dong!",
+            value=":eggplant:",
+            inline=True
+        )
+        embed.set_footer(
+            text=f"Dong request by {context.message.author}"
+        )
+        await context.send(embed=embed)
+
 #    @commands.command(name="invite")
 #    async def invite(self, context):
 #        """
@@ -230,20 +248,28 @@ class general(commands.Cog, name="general"):
             raw_response = await session.get(url)
             response = await raw_response.text()
             response = json.loads(response)
-            regularMarketPrice = round(float(f"{response['quoteResponse']['result'][0]['regularMarketPrice']}"),2)
-            regularMarketChange = round(float(f"{response['quoteResponse']['result'][0]['regularMarketChange']}"),2)
-            regularMarketChangePercent = round(float(f"{response['quoteResponse']['result'][0]['regularMarketChangePercent']}"),2)
-            if regularMarketChange < 0:
-                directionEmoji = "<:red_arrow_down:821559140345315348>"
-            elif regularMarketChange > 0:
-                directionEmoji = "<:green_arrow_up:821559109031559179>"
+            try:
+                regularMarketPrice = round(float(f"{response['quoteResponse']['result'][0]['regularMarketPrice']}"),2)
+                regularMarketChange = round(float(f"{response['quoteResponse']['result'][0]['regularMarketChange']}"),2)
+                regularMarketChangePercent = round(float(f"{response['quoteResponse']['result'][0]['regularMarketChangePercent']}"),2)
+                if regularMarketChange < 0:
+                    directionEmoji = "<:red_arrow_down:821559140345315348>"
+                elif regularMarketChange > 0:
+                    directionEmoji = "<:green_arrow_up:821559109031559179>"
+                else:
+                    directionEmoji = ":sleeping:"
+            except:
+                embed = discord.Embed(
+                    title=f":warning: Stonk error:",
+                    description=f"symbol {cleanargs} not found.",
+                    color=0xFF0000
+                )
             else:
-                directionEmoji = ":sleeping:"
-            embed = discord.Embed(
-                title=f":money_with_wings: Stonk: {response['quoteResponse']['result'][0]['displayName']} ({response['quoteResponse']['result'][0]['fullExchangeName']})",
-                description=f"{response['quoteResponse']['result'][0]['symbol']} market price is: {regularMarketPrice} USD ( {directionEmoji} ${regularMarketChange} | {regularMarketChangePercent}% change )",
-                color=0x00FF00
-            )
+                embed = discord.Embed(
+                    title=f":money_with_wings: Stonk: {response['quoteResponse']['result'][0]['displayName']} ({response['quoteResponse']['result'][0]['fullExchangeName']})",
+                    description=f"{response['quoteResponse']['result'][0]['symbol']} market price is: {regularMarketPrice} USD ( {directionEmoji} ${regularMarketChange} | {regularMarketChangePercent}% change )",
+                    color=0x00FF00
+                )
             await context.send(embed=embed)
 
 

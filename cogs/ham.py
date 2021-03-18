@@ -48,13 +48,22 @@ class ham(commands.Cog, name="ham"):
         )
         await context.send(embed=embed)
 
-    @commands.command(name="dmrid")
-    async def dmrid(self, context, *, args):
+    @commands.command(name="dmr", aliases=["dmrid"])
+    async def dmr(self, context, *, args):
         """
-        Get DMR ID from callsign
+        Get DMR ID from callsign, or vice-versa
         """
-        cleanargs=re.sub(r'[^a-zA-Z0-9]','', args) 
-        url = "https://www.radioid.net/api/dmr/user/?callsign="+cleanargs
+        cleanargs=re.sub(r'[^a-zA-Z0-9]','', args)
+        try:
+            int(cleanargs)
+            requesttype="id"
+            print(f"numeric input, search id {cleanargs}")
+        except:
+            requesttype="callsign"
+            print(f"alphanumeric input, search callsign {cleanargs}")
+        
+        url = f"https://www.radioid.net/api/dmr/user/?{requesttype}={cleanargs}"
+        print(url)
         # Async HTTP request
         async with aiohttp.ClientSession() as session:
             raw_response = await session.get(url)
@@ -63,16 +72,21 @@ class ham(commands.Cog, name="ham"):
                 response = json.loads(response)
             except:
                 embed=discord.Embed(
-                    title=f":warning: DMRID error",
-                    description=f"callsign {cleanargs} not found",
+                    title=f":warning: DMR ID error:",
+                    description=f"{requesttype} {cleanargs} not found",
                     color=0xFF0000
                 )
             else:
                 response = await raw_response.text()
                 response = json.loads(response)
+                for x in range(len(response['results'])):
+                    if x==0:
+                        dmrid=response['results'][0]['id']
+                    else:
+                        dmrid=f"{dmrid}, {response['results'][x]['id']}"
                 embed = discord.Embed(
-                    title=f"<:dmr:752719110332350575> DMRID for {response['results'][0]['callsign']}, {response['results'][0]['fname']} {response['results'][0]['surname']}:",
-                    description=f"DMR ID: {response['results'][0]['id']}",
+                    title=f"<:hytera:782159393822343209> DMR ID result:",
+                    description=f"Callsign: {response['results'][0]['callsign']}\nDMR ID(s): {dmrid}\nName: {response['results'][0]['fname']} {response['results'][0]['surname']}\nQTH: {response['results'][0]['city']}, {response['results'][0]['state']}\nCountry: {response['results'][0]['country']}",
                     color=0x00FF00
                 )
             await context.send(embed=embed)
