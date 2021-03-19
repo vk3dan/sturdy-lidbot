@@ -233,7 +233,10 @@ class general(commands.Cog, name="general"):
                 title=f":cat: {response[0]['data']['children'][0]['data']['title']}",
                 color=0x00FF00
             )
-            embed.set_image(url=response[0]['data']['children'][0]['data']['url'])
+            try:
+                embed.set_image(url=f"https://i.redd.it/{response[0]['data']['children'][0]['data']['gallery_data']['items'][0]['media_id']}.jpg")
+            except:
+                embed.set_image(url=response[0]['data']['children'][0]['data']['url'])
             await context.send(embed=embed)
 
     @commands.command(name="stonk", aliases=["stock"])
