@@ -294,7 +294,5 @@ class general(commands.Cog, name="general"):
         await embed_message.add_reaction("🇳")
         await embed_message.add_reaction("🇰")
 
-
-
 def setup(bot):
     bot.add_cog(general(bot))

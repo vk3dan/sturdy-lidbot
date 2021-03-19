@@ -106,6 +106,11 @@ async def on_message(message):
 	else:
 		if message.author.id not in config.BLACKLIST:
 			# Process the command if the user is not blacklisted
+			if message.content.startswith("73") or message.content.startswith("nini") or message.content.startswith("gn"):
+				await message.add_reaction("👋")
+			elif message.content == "88":
+				await message.add_reaction("🫂")
+				await message.add_reaction("💋")
 			await bot.process_commands(message)
 		else:
 			# Send a message to let the user know he's blacklisted
