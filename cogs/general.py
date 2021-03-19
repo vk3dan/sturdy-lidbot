@@ -293,6 +293,25 @@ class general(commands.Cog, name="general"):
         await embed_message.add_reaction("🇴")
         await embed_message.add_reaction("🇳")
         await embed_message.add_reaction("🇰")
+        
+    @commands.command(name="apod")
+    async def apod(self, context):
+        """
+        Uses NASA api to fetch the astronomy picture of the day.
+        """
+        url="https://api.nasa.gov/planetary/apod?api_key="+config.DATA_GOV_API_KEY
+        # Async HTTP request
+        async with aiohttp.ClientSession() as session:
+            raw_response = await session.get(url)
+            response = await raw_response.text()
+            response = json.loads(response)
+            embed = discord.Embed(
+                title=f":ringed_planet: NASA APOD {response['date']} {response['title']}",
+                color=0x00FF00
+            )
+            embed.set_image(url=response['hdurl'])
+            await context.send(embed=embed)
+
 
 def setup(bot):
     bot.add_cog(general(bot))
