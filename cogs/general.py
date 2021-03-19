@@ -275,6 +275,26 @@ class general(commands.Cog, name="general"):
                 )
             await context.send(embed=embed)
 
+    @commands.command(name="gonk")
+    async def gonk(self, context):
+        """
+        Gonk.
+        """
+        embed = discord.Embed(
+            color=0x0000FF
+        )
+        embed.add_field(
+            name="WHAT THE FUCK IS GONK?",
+            value=":regional_indicator_g: :regional_indicator_o: :regional_indicator_n: :regional_indicator_k:",
+            inline=True
+        )
+        embed_message = await context.send(embed=embed)
+        await embed_message.add_reaction("🇬")
+        await embed_message.add_reaction("🇴")
+        await embed_message.add_reaction("🇳")
+        await embed_message.add_reaction("🇰")
+
+
 
 def setup(bot):
     bot.add_cog(general(bot))
