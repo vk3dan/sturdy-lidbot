@@ -53,7 +53,7 @@ intents.members = True
 
 intents = discord.Intents.default()
 
-bot = Bot(command_prefix=config.BOT_PREFIX, intents=intents)
+bot = Bot(command_prefix=config.BOT_PREFIX, intents=intents, case_insensitive=True)
 
 # The code in this even is executed when the bot is ready
 @bot.event
@@ -106,7 +106,7 @@ async def on_message(message):
 	else:
 		if message.author.id not in config.BLACKLIST:
 			# Process the command if the user is not blacklisted
-			if message.content.startswith("73 ") or message.content.startswith("nini") or message.content.startswith("gn "):
+			if message.content.startswith("73") or message.content.startswith("nini") or message.content.startswith("gn"):
 				await message.add_reaction("👋")
 			elif message.content == "88 ":
 				await message.add_reaction("🫂")

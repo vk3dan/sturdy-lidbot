@@ -221,7 +221,7 @@ class general(commands.Cog, name="general"):
     @commands.command(name="cat", aliases=["kitty","neko"])
     async def kitty(self, context):
         """
-        Fetch a random cat pic from reddit.
+        Fetch a random cat pic from r/catpics on reddit.
         """
         url = "https://www.reddit.com/r/catpics/random.json"
         # Async HTTP request
@@ -242,6 +242,7 @@ class general(commands.Cog, name="general"):
     @commands.command(name="stonk", aliases=["stock"])
     async def stonk(self, context, *, args):
         """
+        Usage: !stonk <code> 
         Get some info about a stonk from its ticker code.
         """
         cleanargs=re.sub(r'[^a-zA-Z0-9]','', args)
@@ -310,6 +311,50 @@ class general(commands.Cog, name="general"):
                 color=0x00FF00
             )
             embed.set_image(url=response['hdurl'])
+            await context.send(embed=embed)
+
+    @commands.command(name="wx", aliases=["weather"])
+    async def wx(self, context, *, args):
+        """
+        Usage: !wx <location>
+        Fetch the weather for the place requested.
+        """
+        cleanargs=re.sub(r'[^a-zA-Z0-9\, -]','', args)
+        if re.match(".* ..$",cleanargs):
+            cleanargs=f"{cleanargs[:-3]},{cleanargs[-3:]}"
+        url = f"https://api.openweathermap.org/data/2.5/weather?q={cleanargs}&appid="+config.OPENWEATHER_API_KEY
+        print(url)
+        # Async HTTP request
+        async with aiohttp.ClientSession() as session:
+            raw_response = await session.get(url)
+            response = await raw_response.text()
+            response = json.loads(response)
+            try:
+                tempc = round(float(response['main']['temp']-272.15),1)
+                tempf = round(float(response['main']['temp']*1.8-459.67),1)
+                flc = round(float(response['main']['feels_like']-272.15),1)
+                flf = round(float(response['main']['feels_like']*1.8-459.67),1)
+                minc = round(float(response['main']['temp_min']-272.15),1)
+                minf = round(float(response['main']['temp_min']*1.8-459.67),1)
+                maxc = round(float(response['main']['temp_max']-272.15),1)
+                maxf = round(float(response['main']['temp_max']*1.8-459.67),1)
+            except:
+                embed = discord.Embed(
+                    title=":warning: Weather error",
+                    description=f"place {cleanargs} not found",
+                color=0x00FF00
+                )
+            else:
+                embed = discord.Embed(
+                    title=f":sun_with_face: Weather for {response['name']}, {response['sys']['country']}",
+                    description=f"""
+                    **Current Conditions:** {response['weather'][0]['description'].capitalize()}
+                    **Temperature:** {tempc} ºC ({tempf} ºF) | ***Feels like:*** *{flc} ºC ({flf} ºF)*
+                    **Minimum:** {minc} ºC ({minf} ºF) | **Maximum:** {maxc} ºC ({maxf} ºF)
+                    **Humidity:** {response['main']['humidity']}% | **Pressure:** {response['main']['pressure']} hPa 
+                    """,
+                    color=0x00FF00
+                )
             await context.send(embed=embed)
 
 
