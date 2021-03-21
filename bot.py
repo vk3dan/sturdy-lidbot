@@ -106,7 +106,7 @@ async def on_message(message):
 	else:
 		if message.author.id not in config.BLACKLIST:
 			# Process the command if the user is not blacklisted
-			wavewords=("73","73s","nini","gn","night","l8r","l9r","👋","hi","gm","ga","ge", "hey")
+			wavewords=("73","73s","nini","gn","night","l8r","l9r","👋","gm","ga","ge", "heya")
 			if any(c in message.content for c in wavewords):
 				await message.add_reaction("👋")
 			elif message.content == "88":
