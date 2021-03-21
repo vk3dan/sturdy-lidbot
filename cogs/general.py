@@ -1,4 +1,4 @@
-import os, sys, discord, platform, random, aiohttp, json, re
+import os, sys, discord, platform, random, aiohttp, json, re, wolframalpha
 from discord.ext import commands
 if not os.path.isfile("config.py"):
     sys.exit("'config.py' not found! Please add it and try again.")
@@ -334,7 +334,7 @@ class general(commands.Cog, name="general"):
                 embed = discord.Embed(
                     title=":warning: Weather error",
                     description=f"place {cleanargs} not found",
-                color=0x00FF00
+                color=0xFF0000
                 )
             else:
                 embed = discord.Embed(
@@ -349,6 +349,29 @@ class general(commands.Cog, name="general"):
                 )
             await context.send(embed=embed)
 
+    @commands.command(name="ask", aliases=["wolfram"])
+    async def askwolfram(self, context, *, args):
+        """
+        Usage: !ask <input> 
+        Give a question, some math, whatever; get answer back hopefully.
+        """
+        try:
+            client=wolframalpha.Client(config.WOLFRAMALPHA_API_KEY)
+            res=client.query(args)
+            response=next(res.results).text
+        except:
+            embed = discord.Embed(
+                title=f":teacher: You asked: *\"{args}\"*",
+                description=f"I don't have a good answer for that or I timed out.",
+                color=0xFF0000
+            )
+        else:    
+            embed = discord.Embed(
+                title=f":teacher: You asked: *\"{args}\"*",
+                description=f"**Answer:** {response}",
+                color=0x00FF00
+            )
+        await context.send(embed=embed)
 
 def setup(bot):
     bot.add_cog(general(bot))
