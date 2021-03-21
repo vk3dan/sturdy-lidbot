@@ -41,55 +41,55 @@ class general(commands.Cog, name="general"):
         )
         await context.send(embed=embed)
 
-#    @commands.command(name="serverinfo")
-#    async def serverinfo(self, context):
-#        """
-#        Get some useful (or not) information about the server.
-#        """
-#        server = context.message.guild
-#        roles = [x.name for x in server.roles]
-#        role_length = len(roles)
-#        if role_length > 50:
-#            roles = roles[:50]
-#            roles.append(f">>>> Displaying[50/{len(roles)}] Roles")
-#        roles = ", ".join(roles)
-#        channels = len(server.channels)
-#        time = str(server.created_at)
-#        time = time.split(" ")
-#        time = time[0]
-#
-#        embed = discord.Embed(
-#            title="**Server Name:**",
-#            description=f"{server}",
-#            color=0x00FF00
-#        )
-#        embed.set_thumbnail(
-#            url=server.icon_url
-#        )
-#        embed.add_field(
-#            name="Owner",
-#            value=f"{server.owner}\n{server.owner.id}"
-#        )
-#        embed.add_field(
-#            name="Server ID",
-#            value=server.id
-#        )
-#        embed.add_field(
-#            name="Member Count",
-#            value=server.member_count
-#        )
-#        embed.add_field(
-#            name="Text/Voice Channels",
-#            value=f"{channels}"
-#        )
-#        embed.add_field(
-#            name=f"Roles ({role_length})",
-#            value=roles
-#        )
-#        embed.set_footer(
-#            text=f"Created at: {time}"
-#        )
-#        await context.send(embed=embed)
+    @commands.command(name="serverinfo")
+    async def serverinfo(self, context):
+        """
+        Get some useful (or not) information about the server.
+        """
+        server = context.message.guild
+        roles = [x.name for x in server.roles]
+        role_length = len(roles)
+        if role_length > 50:
+            roles = roles[:50]
+            roles.append(f">>>> Displaying[50/{len(roles)}] Roles")
+        roles = ", ".join(roles)
+        channels = len(server.channels)
+        time = str(server.created_at)
+        time = time.split(" ")
+        time = time[0]
+
+        embed = discord.Embed(
+            title="**Server Name:**",
+            description=f"{server}",
+            color=0x00FF00
+        )
+        embed.set_thumbnail(
+            url=server.icon_url
+        )
+        embed.add_field(
+            name="Owner",
+            value=f"{server.owner}\n{server.owner.id}"
+        )
+        embed.add_field(
+            name="Server ID",
+            value=server.id
+        )
+        embed.add_field(
+            name="Member Count",
+            value=server.member_count
+        )
+        embed.add_field(
+            name="Text/Voice Channels",
+            value=f"{channels}"
+        )
+        embed.add_field(
+            name=f"Roles ({role_length})",
+            value=roles
+        )
+        embed.set_footer(
+            text=f"Created at: {time}"
+        )
+        await context.send(embed=embed)
 
     @commands.command(name="ping")
     async def ping(self, context):
@@ -134,14 +134,6 @@ class general(commands.Cog, name="general"):
 #        """
 #        await context.send("I sent you a private message!")
 #        await context.author.send(f"Invite me by clicking here: https://discordapp.com/oauth2/authorize?&client_id={config.APPLICATION_ID}&scope=bot&permissions=8")
-
-#    @commands.command(name="server")
-#    async def server(self, context):
-#        """
-#        Get the invite link of the discord server of the bot for some support.
-#        """
-#        await context.send("I sent you a private message!")
-#        await context.author.send("Join my discord server by clicking here: https://discord.gg/HzJ3Gfr")
 
     @commands.command(name="poll")
     async def poll(self, context, *args):
