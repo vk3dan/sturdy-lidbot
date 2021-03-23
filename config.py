@@ -6,7 +6,9 @@
 # context menu on your name in discord under Copy ID.
 # if you want to make more than 30 requests per hour to 
 # data.gov apis like nasa you will need to get an api key to
-# replace "DEMO_KEY".
+# replace "DEMO_KEY" below. The openweathermap (!wx), 
+# wolframalpha (!ask) and exchangerate-api.com apis need a 
+# free key from their websites to function. 
 
 BOT_PREFIX = ("YOUR_BOT_PREFIX_HERE")
 TOKEN = "YOUR_TOKEN_HERE"
@@ -15,6 +17,7 @@ OWNERS = [123456789, 987654321]
 DATA_GOV_API_KEY = "DEMO_KEY"
 OPENWEATHER_API_KEY = "YOUR_API_KEY_HERE"
 WOLFRAMALPHA_API_KEY = "YOUR_API_KEY_HERE"
+EXCHANGERATE_API_KEY = "YOUR_API_KEY_HERE"
 BLACKLIST = []
  # Default cogs that I use in the bot at the moment
 STARTUP_COGS = [

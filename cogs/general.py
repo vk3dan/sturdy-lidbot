@@ -175,37 +175,52 @@ class general(commands.Cog, name="general"):
         await context.send(embed=embed)
 
     @commands.command(name="btc", aliases=["bitcoin"])
-    async def bitcoin(self, context):
+    async def bitcoin(self, context,*,args=""):
         """
-        Get the current price of bitcoin in USD.
+        Usage: !bitcoin <currency> Gets the current price of bitcoin.
+        defaults to USD, but can take other currency as an argument
         """
+        if len(args)==3:
+            cleanargs=re.sub(r'[^a-zA-Z0-9]','', args)
+            cur=cleanargs.upper()
+        else:
+            cur="USD"
         url = "https://api.coindesk.com/v1/bpi/currentprice/BTC.json"
         # Async HTTP request
         async with aiohttp.ClientSession() as session:
             raw_response = await session.get(url)
             response = await raw_response.text()
             response = json.loads(response)
+            rate = response['bpi']['USD']['rate'].replace(',', '')
+            converted = await self.convertcurrency(rate, "USD", cur)
             embed = discord.Embed(
                 title=":coin: Bitcoin",
-                description=f"Bitcoin price is: ${response['bpi']['USD']['rate']} USD",
+                description=f"Bitcoin price is: ${converted:,.4f} {cur}",
                 color=0x00FF00
             )
             await context.send(embed=embed)
 
     @commands.command(name="doge", aliases=["dogecoin"])
-    async def dogecoin(self, context):
+    async def dogecoin(self, context,*,args=""):
         """
         Get the current price of dogecoin in USD *TO THE MOON*.
         """
+        if len(args)==3:
+            cleanargs=re.sub(r'[^a-zA-Z0-9]','', args)
+            cur=cleanargs.upper()
+        else:
+            cur="USD"
         url = "https://my.dogechain.info/api/v2/get_price/doge/usd"
         # Async HTTP request
         async with aiohttp.ClientSession() as session:
             raw_response = await session.get(url)
             response = await raw_response.text()
             response = json.loads(response)
+            rate = response['data']['prices'][0]['price']
+            converted = await self.convertcurrency(rate, "USD", cur)
             embed = discord.Embed(
                 title="<:doge:805916026310492170> Dogecoin to the moon :rocket:",
-                description=f"Dogecoin price is: ${response['data']['prices'][0]['price']} USD",
+                description=f"Dogecoin price is: ${converted:,.7f} {cur}",
                 color=0x00FF00
             )
             await context.send(embed=embed)
@@ -359,19 +374,30 @@ class general(commands.Cog, name="general"):
             client=wolframalpha.Client(config.WOLFRAMALPHA_API_KEY)
             res=client.query(args)
             response=next(res.results).text
+            escapedargs=re.escape(args)
+            print(escapedargs)
         except:
             embed = discord.Embed(
-                title=f":teacher: You asked: *\"{args}\"*",
-                description=f"I don't have a good answer for that or I timed out.",
+                title=":teacher: Wolfram|Alpha Error:",
+                description="I don't have a good answer for that.",
                 color=0xFF0000
             )
-        else:    
+        else:
             embed = discord.Embed(
-                title=f":teacher: You asked: *\"{args}\"*",
+                title=":teacher: Wolfram|Alpha",
                 description=f"**Answer:** {response}",
                 color=0x00FF00
             )
         await context.send(embed=embed)
+
+    async def convertcurrency(self, amount, fromcurrency, tocurrency):
+        currencyurl=f"https://v6.exchangerate-api.com/v6/{config.EXCHANGERATE_API_KEY}/latest/{fromcurrency}"
+        async with aiohttp.ClientSession() as session:
+            raw_response = await session.get(currencyurl)
+            response = await raw_response.text()
+            response = json.loads(response)
+            answer = float(amount)*float(response['conversion_rates'][(tocurrency)])
+            return answer
 
 def setup(bot):
     bot.add_cog(general(bot))

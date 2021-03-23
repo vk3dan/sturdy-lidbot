@@ -106,9 +106,9 @@ async def on_message(message):
 	else:
 		if message.author.id not in config.BLACKLIST:
 			# Process the command if the user is not blacklisted
-			startwords=("73","73s","hi","hey","heya","ohaider","gm","ga","ge","gn","👋","night","later","l8r","l9r")
+			startwords=("73","73s","hi ","hey ","heya","ohaider","gm","ga","ge","gn","👋","night","later","l8r","l9r")
 			endwords=(" 73"," 73s","nini"," gn"," night"," l8r"," l9r","👋")
-			if message.content.startswith(tuple(startwords)) or message.content.endswith(tuple(endwords)):
+			if message.content.lower().startswith(tuple(startwords)) or message.content.lower().endswith(tuple(endwords)):
 				await message.add_reaction("👋")
 			elif message.content == "88":
 				await message.add_reaction("🫂")
