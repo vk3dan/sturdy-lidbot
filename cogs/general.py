@@ -354,14 +354,16 @@ class general(commands.Cog, name="general"):
             else:
                 embed = discord.Embed(
                     title=f":sun_with_face: Weather for {response['name']}, {response['sys']['country']}",
-                    description=f"""
-                    **Current Conditions:** {response['weather'][0]['description'].capitalize()}
-                    **Temperature:** {tempc} ºC ({tempf} ºF) | ***Feels like:*** *{flc} ºC ({flf} ºF)*
-                    **Minimum:** {minc} ºC ({minf} ºF) | **Maximum:** {maxc} ºC ({maxf} ºF)
-                    **Humidity:** {response['main']['humidity']}% | **Pressure:** {response['main']['pressure']} hPa 
-                    """,
+                    description=f"**Current Conditions:** {response['weather'][0]['description'].capitalize()}",
                     color=0x00FF00
                 )
+                embed.set_thumbnail(url=f"http://openweathermap.org/img/wn/{response['weather'][0]['icon']}@2x.png")
+                embed.add_field(name="Temperature:", value=f"{tempc} ºC ({tempf} ºF)", inline=True)
+                embed.add_field(name="*Feels like:*", value=f"*{flc} ºC ({flf} ºF)*", inline=True)
+                embed.add_field(name="Humidity:", value=f"{response['main']['humidity']}%", inline=True)
+                embed.add_field(name="Daily Minimum:", value=f"{minc} ºC ({minf} ºF)", inline=True)
+                embed.add_field(name="Daily Maximum:", value=f"{maxc} ºC ({maxf} ºF)", inline=True)
+                embed.add_field(name="Pressure:", value=f"{response['main']['pressure']} hPa", inline=True)
             await context.send(embed=embed)
 
     @commands.command(name="ask", aliases=["wolfram"])
