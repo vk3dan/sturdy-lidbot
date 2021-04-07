@@ -1,5 +1,6 @@
 import os, sys, discord, platform, random, aiohttp, json, re
 from discord.ext import commands
+import urllib.parse
 if not os.path.isfile("config.py"):
     sys.exit("'config.py' not found! Please add it and try again.")
 else:
@@ -90,6 +91,35 @@ class ham(commands.Cog, name="ham"):
                     color=0x00FF00
                 )
             await context.send(embed=embed)
+
+    @commands.command(name="morse")
+    async def morse(self, context, *, args):
+        """
+        Convert input text to morse code.
+        """
+        cleanargs=re.sub(r'[^\x00-\x7F]+',' ', args)
+        cleanargs=urllib.parse.quote(cleanargs, safe='')
+        url = f"http://www.morsecode-api.de/encode?string={cleanargs}"
+        async with aiohttp.ClientSession() as session:
+            raw_response = await session.get(url)
+            response = await raw_response.text()
+            response = json.loads(response)
+        outputtext = response['morsecode'].replace(".......","/")
+        await context.send(outputtext)
+
+    @commands.command(name="demorse")
+    async def demorse(self, context, *, args):
+        """
+        Convert morse code to text.
+        """
+        cleanargs=args.replace("/",".......")
+        cleanargs=urllib.parse.quote(cleanargs, safe='')
+        url = f"http://www.morsecode-api.de/decode?string={cleanargs}"
+        async with aiohttp.ClientSession() as session:
+            raw_response = await session.get(url)
+            response = await raw_response.text()
+            response = json.loads(response)
+        await context.send(response['plaintext'])
 
 def setup(bot):
     bot.add_cog(ham(bot))

@@ -1,5 +1,6 @@
 import os, sys, discord, platform, random, aiohttp, json, re, wolframalpha
 from discord.ext import commands
+from currency_symbols import CurrencySymbols
 if not os.path.isfile("config.py"):
     sys.exit("'config.py' not found! Please add it and try again.")
 else:
@@ -193,9 +194,10 @@ class general(commands.Cog, name="general"):
             response = json.loads(response)
             rate = response['bpi']['USD']['rate'].replace(',', '')
             converted = await self.convertcurrency(rate, "USD", cur)
+            cursymbol = CurrencySymbols.get_symbol(cur)
             embed = discord.Embed(
                 title=":coin: Bitcoin",
-                description=f"Bitcoin price is: ${converted:,.4f} {cur}",
+                description=f"Bitcoin price is: {cursymbol}{converted:,.4f} {cur}",
                 color=0x00FF00
             )
             await context.send(embed=embed)
@@ -218,9 +220,10 @@ class general(commands.Cog, name="general"):
             response = json.loads(response)
             rate = response['data']['prices'][0]['price']
             converted = await self.convertcurrency(rate, "USD", cur)
+            cursymbol = CurrencySymbols.get_symbol(cur)
             embed = discord.Embed(
                 title="<:doge:805916026310492170> Dogecoin to the moon :rocket:",
-                description=f"Dogecoin price is: ${converted:,.7f} {cur}",
+                description=f"Dogecoin price is: {cursymbol}{converted:,.7f} {cur}",
                 color=0x00FF00
             )
             await context.send(embed=embed)
