@@ -30,6 +30,9 @@ Get some info about a stonk from its ticker code.
 Fetch the weather for the place requested.
 !ask - Usage: !ask <input> 
 Give a question, some math, whatever; get answer back hopefully.
+!exchange - Usage: !exchange <value> <sourcecurrency> <outputcurrency>
+For example !exchange 56 AUD USD
+Converts an amount of currency to another.
 ```
 #### Help
 ```
