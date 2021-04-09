@@ -222,7 +222,7 @@ class general(commands.Cog, name="general"):
             converted = await self.convertcurrency(rate, "USD", cur)
             cursymbol = CurrencySymbols.get_symbol(cur)
             embed = discord.Embed(
-                title="<:doge:805916026310492170> Dogecoin to the moon :rocket:",
+                title="<:doge:829928818508431400> Dogecoin to the moon :rocket:",
                 description=f"Dogecoin price is: {cursymbol}{converted:,.7f} {cur}",
                 color=0x00FF00
             )

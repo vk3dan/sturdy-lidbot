@@ -86,7 +86,7 @@ class ham(commands.Cog, name="ham"):
                     else:
                         dmrid=f"{dmrid}, {response['results'][x]['id']}"
                 embed = discord.Embed(
-                    title=f"<:hytera:782159393822343209> DMR ID result:",
+                    title=f"<:hytera:829926368824918046> DMR ID result:",
                     description=f"Callsign: {response['results'][0]['callsign']}\nDMR ID(s): {dmrid}\nName: {response['results'][0]['fname']} {response['results'][0]['surname']}\nQTH: {response['results'][0]['city']}, {response['results'][0]['state']}\nCountry: {response['results'][0]['country']}",
                     color=0x00FF00
                 )
