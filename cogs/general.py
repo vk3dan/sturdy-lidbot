@@ -427,7 +427,7 @@ class general(commands.Cog, name="general"):
         except:
             embed = discord.Embed(
                 title=":warning: Exchange Error",
-                description="Currency error: check that you are using correct\n3 character currency names",
+                description="Currency error: check that you are using correct\nISO 4217 currency code",
                 color=0xFF0000
             )
         else:
