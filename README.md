@@ -8,6 +8,42 @@ bot template.
 It has had some features added sofar such as dogecoin price, random cat
 pictures and a couple of ham radio related commands.
 
+## Commands
+
+```
+!info - Get some useful (or not) information about the bot.
+!serverinfo - Get some useful (or not) information about the server.
+!ping - Check if the bot is alive.
+!ding - Check if the dong is alive.
+!poll - Create a poll where members can vote.
+!8ball - Ask any question to the bot.
+!btc - Usage: !bitcoin <currency> Gets the current price of bitcoin.
+defaults to USD, but can take other currency as an argument
+!doge - Get the current price of dogecoin in USD *TO THE MOON*.
+!cat - Fetch a random cat pic from r/catpics on reddit.
+!stonk - Usage: !stonk <code> 
+Get some info about a stonk from its ticker code.
+!gonk - Gonk.
+!apod - Uses NASA api to fetch the astronomy picture of the day.
+!wx - Usage: !wx <location>
+Fetch the weather for the place requested.
+!ask - Usage: !ask <input> 
+Give a question, some math, whatever; get answer back hopefully.
+Help
+!help - List all commands from every Cog the bot has loaded.
+Owner
+!shutdown - Make the bot shutdown
+!say - The bot will say anything you want.
+!embed - The bot will say anything you want, but within embeds.
+!blacklist - Lets you add or remove a user from not being able to use the bot.
+Ham
+!bands - Fetch an image about HF band conditions.
+!solar - Fetch an image about solar conditions.
+!dmr - Get DMR ID from callsign, or vice-versa
+!morse - Convert input text to morse code.
+!demorse - Convert morse code to text.
+```
+
 ## Authors
 * **[vk3dan](https://github.com/vk3dan)** - That's me
 * **[Krypton (@kkrypt0nn)](https://github.com/kkrypt0nn)** - Author of the
