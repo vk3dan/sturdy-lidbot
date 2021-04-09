@@ -416,6 +416,8 @@ class general(commands.Cog, name="general"):
                 description="Input error: incorrect input.\nUsage: !exchange <value> <sourcecurrency> <outputcurrency>",
                 color=0xFF0000
             )
+            await context.send(embed=embed)
+            return
         try:
             convertedamount = await self.convertcurrency(cleaninputamount, in_cur, out_cur)
             inputcursymbol = CurrencySymbols.get_symbol(in_cur)
