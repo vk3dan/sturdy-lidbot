@@ -395,6 +395,48 @@ class general(commands.Cog, name="general"):
             )
         await context.send(embed=embed)
 
+    @commands.command(name="exchange", aliases=["convertcurrency", "currency"])
+    async def currency(self, context, *args):
+        """
+        Usage: !exchange <value> <sourcecurrency> <outputcurrency>
+        For example !exchange 56 AUD USD
+        Converts an amount of currency to another.
+        """
+        if len(args)==3:
+            cleaninputamount=re.sub(r'[^0-9\.]','', args[0])
+            in_cur=args[1].upper()
+            out_cur=args[2].upper()
+        elif len(args)==4:
+            cleaninputamount=re.sub(r'[^0-9\.]','', args[0])
+            in_cur=args[1].upper()
+            out_cur=args[3].upper()
+        else:
+            embed = discord.Embed(
+                title=":warning: Exchange Error",
+                description="Input error: incorrect input.\nUsage: !exchange <value> <sourcecurrency> <outputcurrency>",
+                color=0xFF0000
+            )
+        try:
+            convertedamount = await self.convertcurrency(cleaninputamount, in_cur, out_cur)
+            inputcursymbol = CurrencySymbols.get_symbol(in_cur)
+            if inputcursymbol == None:inputcursymbol=""
+            outputcursymbol = CurrencySymbols.get_symbol(out_cur)
+            if outputcursymbol == None:outputcursymbol=""
+        except:
+            embed = discord.Embed(
+                title=":warning: Exchange Error",
+                description="Currency error: check that you are using correct\n3 character currency names",
+                color=0xFF0000
+            )
+        else:
+            embed = discord.Embed(
+                title=":coin: Exchange:",
+                color=0x00FF00
+            )
+            embed.add_field(name="Input", value=f"{inputcursymbol}{float(cleaninputamount):,.2f} {in_cur}", inline=True)
+            embed.add_field(name="Output", value=f"{outputcursymbol}{float(convertedamount):,.2f} {out_cur}", inline=True)
+        await context.send(embed=embed)
+
     async def convertcurrency(self, amount, fromcurrency, tocurrency):
         currencyurl=f"https://v6.exchangerate-api.com/v6/{config.EXCHANGERATE_API_KEY}/latest/{fromcurrency}"
         async with aiohttp.ClientSession() as session:
