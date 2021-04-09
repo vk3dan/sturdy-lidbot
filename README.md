@@ -10,6 +10,7 @@ pictures and a couple of ham radio related commands.
 
 ## Commands
 
+### General
 ```
 !info - Get some useful (or not) information about the bot.
 !serverinfo - Get some useful (or not) information about the server.
@@ -29,14 +30,20 @@ Get some info about a stonk from its ticker code.
 Fetch the weather for the place requested.
 !ask - Usage: !ask <input> 
 Give a question, some math, whatever; get answer back hopefully.
-Help
+```
+### Help
+```
 !help - List all commands from every Cog the bot has loaded.
-Owner
+```
+### Owner
+```
 !shutdown - Make the bot shutdown
 !say - The bot will say anything you want.
 !embed - The bot will say anything you want, but within embeds.
 !blacklist - Lets you add or remove a user from not being able to use the bot.
-Ham
+```
+### Ham
+```
 !bands - Fetch an image about HF band conditions.
 !solar - Fetch an image about solar conditions.
 !dmr - Get DMR ID from callsign, or vice-versa
