@@ -1,4 +1,4 @@
-import os, sys, discord, platform, random, aiohttp, json, re
+import os, sys, discord, platform, random, aiohttp, json, re, xmltodict
 from discord.ext import commands
 import urllib.parse
 if not os.path.isfile("config.py"):
@@ -120,6 +120,64 @@ class ham(commands.Cog, name="ham"):
             response = await raw_response.text()
             response = json.loads(response)
         await context.send(response['plaintext'])
+
+    @commands.command(name="qrz", aliases=["call","lookup"])
+    async def qrz(self, context, *, args):
+        """
+        Lookup callsign on qrz.com
+        """
+        cleanargs=re.sub(r'[^a-zA-Z0-9]','', args)
+        qrzpassword=urllib.parse.quote(config.QRZ_PASSWORD, safe='')
+        keyurl = f"http://xmldata.qrz.com/xml/current/?username={config.QRZ_USERNAME};password={qrzpassword}"
+        async with aiohttp.ClientSession() as session:
+            raw_response = await session.get(keyurl)
+            response = await raw_response.text()
+            response = xmltodict.parse(response)
+            sessionkey=response['QRZDatabase']['Session']['Key']
+            url = f"http://xmldata.qrz.com/xml/current/?s={sessionkey};callsign={cleanargs}"
+            raw_response = await session.get(url)
+            response = await raw_response.text()
+            response = xmltodict.parse(response)
+        try:
+            embed = discord.Embed(
+                title=f"QRZ lookup result:",
+                color=0x00FF00
+            )
+            embed.add_field(
+                name="Callsign:",
+                value=response['QRZDatabase']['Callsign']['call'],
+                inline=False
+            )
+            embed.add_field(
+                name="Name:",
+                value=f"{response['QRZDatabase']['Callsign']['fname']} {response['QRZDatabase']['Callsign']['name']}",
+                inline=False
+            )
+            embed.add_field(
+                name="QTH:",
+                value=response['QRZDatabase']['Callsign']['addr2'],            
+                inline=True
+            )
+            try:
+                embed.add_field(
+                    name="State:",
+                    value=response['QRZDatabase']['Callsign']['state'],
+                    inline=True
+                )
+            except KeyError:
+                pass
+            embed.add_field(
+                name="Country:",
+                value=response['QRZDatabase']['Callsign']['country'],
+                inline=True
+            )
+        except:
+            embed=discord.Embed(
+                title=f":warning: QRZ error:",
+                description=f"Callsign {cleanargs} not found",
+                color=0xFF0000
+            )
+        await context.send(embed=embed)
 
 def setup(bot):
     bot.add_cog(ham(bot))

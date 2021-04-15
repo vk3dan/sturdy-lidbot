@@ -9,6 +9,7 @@
 # replace "DEMO_KEY" below. The openweathermap (!wx), 
 # wolframalpha (!ask) and exchangerate-api.com apis need a 
 # free key from their websites to function. 
+# Add QRZ username and password for callsign lookup function
 
 BOT_PREFIX = ("YOUR_BOT_PREFIX_HERE")
 TOKEN = "YOUR_TOKEN_HERE"
@@ -18,6 +19,8 @@ DATA_GOV_API_KEY = "DEMO_KEY"
 OPENWEATHER_API_KEY = "YOUR_API_KEY_HERE"
 WOLFRAMALPHA_API_KEY = "YOUR_API_KEY_HERE"
 EXCHANGERATE_API_KEY = "YOUR_API_KEY_HERE"
+QRZ_USERNAME = "YOUR_QRZ_USERNAME"
+QRZ_PASSWORD = "YOUR_QRZ_PASSWORD"
 BLACKLIST = []
  # Default cogs that I use in the bot at the moment
 STARTUP_COGS = [

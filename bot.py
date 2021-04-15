@@ -113,6 +113,11 @@ async def on_message(message):
 			elif message.content == "88":
 				await message.add_reaction("🫂")
 				await message.add_reaction("💋")
+			elif "gonk" in message.content.lower():
+				await message.add_reaction("🇬")
+				await message.add_reaction("🇴")
+				await message.add_reaction("🇳")
+				await message.add_reaction("🇰")
 			await bot.process_commands(message)
 		else:
 			# Send a message to let the user know he's blacklisted
