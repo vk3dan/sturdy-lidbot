@@ -134,7 +134,7 @@ class ham(commands.Cog, name="ham"):
             response = await raw_response.text()
             response = xmltodict.parse(response)
             sessionkey=response['QRZDatabase']['Session']['Key']
-            url = f"http://xmldata.qrz.com/xml/current/?s={sessionkey};callsign={cleanargs}"
+            url = f"http://xmldata.qrz.com/xml/current/?s={sessionkey};callsign={cleanargs.upper()}"
             raw_response = await session.get(url)
             response = await raw_response.text()
             response = xmltodict.parse(response)
@@ -174,10 +174,79 @@ class ham(commands.Cog, name="ham"):
         except:
             embed=discord.Embed(
                 title=f":warning: QRZ error:",
-                description=f"Callsign {cleanargs} not found",
+                description=f"Callsign {cleanargs.upper()} not found",
                 color=0xFF0000
             )
         await context.send(embed=embed)
+
+    @commands.command(name="dxcc", aliases=["country"])
+    async def dxcc(self, context, *, args):
+        """
+        Lookup dxcc from number, callsign or prefix
+        """
+        cleanargs=re.sub(r'[^a-zA-Z0-9]','', args)
+        qrzpassword=urllib.parse.quote(config.QRZ_PASSWORD, safe='')
+        keyurl = f"http://xmldata.qrz.com/xml/current/?username={config.QRZ_USERNAME};password={qrzpassword}"
+        async with aiohttp.ClientSession() as session:
+            raw_response = await session.get(keyurl)
+            response = await raw_response.text()
+            response = xmltodict.parse(response)
+            sessionkey=response['QRZDatabase']['Session']['Key']
+            url = f"http://xmldata.qrz.com/xml/current/?s={sessionkey};dxcc={cleanargs.upper()}"
+            raw_response = await session.get(url)
+            response = await raw_response.text()
+            response = xmltodict.parse(response)
+        try:
+            embed = discord.Embed(
+                title=f"DXCC for {cleanargs.upper()}:",
+                color=0x00FF00
+            )
+            embed.add_field(
+                name="DXCC number:",
+                value=response['QRZDatabase']['DXCC']['dxcc'],
+                inline=True
+            )
+            embed.add_field(
+                name="Name:",
+                value=response['QRZDatabase']['DXCC']['name'],
+                inline=True
+            )
+            embed.add_field(
+                name="Continent:",
+                value=response['QRZDatabase']['DXCC']['continent'],            
+                inline=True
+            )
+            embed.add_field(
+                name="ITU zone:",
+                value=response['QRZDatabase']['DXCC']['ituzone'],
+                inline=True
+            )
+            embed.add_field(
+                name="CQ zone:",
+                value=response['QRZDatabase']['DXCC']['cqzone'],
+                inline=True
+            )
+            try:
+                embed.add_field(
+                    name="Timezone:",
+                    value=f"UTC {int(response['QRZDatabase']['DXCC']['timezone']):+}",
+                    inline=True
+                )
+            except KeyError:
+                pass
+            embed.add_field(
+                name="Coordinates:",
+                value=f"Lat: {response['QRZDatabase']['DXCC']['lat']}, Lon: {response['QRZDatabase']['DXCC']['lon']}",
+                inline=True
+            )
+        except:
+            embed=discord.Embed(
+                title=f":warning: DXCC error:",
+                description=f"DXCC {cleanargs} not found",
+                color=0xFF0000
+            )
+        await context.send(embed=embed)
+
 
 def setup(bot):
     bot.add_cog(ham(bot))
