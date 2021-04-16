@@ -86,9 +86,34 @@ class ham(commands.Cog, name="ham"):
                     else:
                         dmrid=f"{dmrid}, {response['results'][x]['id']}"
                 embed = discord.Embed(
-                    title=f"<:hytera:829926368824918046> DMR ID result:",
-                    description=f"Callsign: {response['results'][0]['callsign']}\nDMR ID(s): {dmrid}\nName: {response['results'][0]['fname']} {response['results'][0]['surname']}\nQTH: {response['results'][0]['city']}, {response['results'][0]['state']}\nCountry: {response['results'][0]['country']}",
+                    title=f"DMR ID result:",
                     color=0x00FF00
+                )
+                embed.set_thumbnail(url=f"https://cdn.discordapp.com/emojis/829926368824918046.png")
+                embed.add_field(
+                    name="Callsign:",
+                    value=response['results'][0]['callsign'],
+                    inline=False
+                )
+                embed.add_field(
+                    name="DMR ID(s):",
+                    value=dmrid,
+                    inline=False
+                )
+                embed.add_field(
+                    name="Name:",
+                    value=f"{response['results'][0]['fname']} {response['results'][0]['surname']}",
+                    inline=True
+                )
+                embed.add_field(
+                    name="QTH:",
+                    value=f"{response['results'][0]['city']}, {response['results'][0]['state']}",
+                    inline=True
+                )
+                embed.add_field(
+                    name="Country:",
+                    value=response['results'][0]['country'],
+                    inline=True
                 )
             await context.send(embed=embed)
 
@@ -143,6 +168,8 @@ class ham(commands.Cog, name="ham"):
                 title=f"QRZ lookup result:",
                 color=0x00FF00
             )
+            qrzlogo=file = discord.File("images/qrz.png", filename="qrz.png")
+            embed.set_thumbnail(url=f"attachment://qrz.png")
             embed.add_field(
                 name="Callsign:",
                 value=response['QRZDatabase']['Callsign']['call'],
@@ -177,7 +204,7 @@ class ham(commands.Cog, name="ham"):
                 description=f"Callsign {cleanargs.upper()} not found",
                 color=0xFF0000
             )
-        await context.send(embed=embed)
+        await context.send(file=qrzlogo, embed=embed)
 
     @commands.command(name="dxcc", aliases=["country"])
     async def dxcc(self, context, *, args):
@@ -242,7 +269,7 @@ class ham(commands.Cog, name="ham"):
         except:
             embed=discord.Embed(
                 title=f":warning: DXCC error:",
-                description=f"DXCC {cleanargs} not found",
+                description=f"DXCC {cleanargs.upper()} not found",
                 color=0xFF0000
             )
         await context.send(embed=embed)
