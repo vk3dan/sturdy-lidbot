@@ -18,9 +18,11 @@ pictures and a couple of ham radio related commands.
 !ding - Check if the dong is alive.
 !poll - Create a poll where members can vote.
 !8ball - Ask any question to the bot.
-!btc - Usage: !bitcoin <currency> Gets the current price of bitcoin.
-defaults to USD, but can take other currency as an argument
-!doge - Get the current price of dogecoin in USD *TO THE MOON*.
+!btc - Usage: !bitcoin <currency> - Gets the current price of bitcoin.
+defaults to USD, can specify currency with ISO 4217 currency codes
+!doge - Usage: !doge <currency> - Gets the current price of dogecoin.
+defaults to USD, can specify currency with ISO 4217 currency codes.
+*TO THE MOON*.
 !cat - Fetch a random cat pic from r/catpics on reddit.
 !stonk - Usage: !stonk <code> 
 Get some info about a stonk from its ticker code.
@@ -49,9 +51,13 @@ Converts an amount of currency to another.
 ```
 !bands - Fetch an image about HF band conditions.
 !solar - Fetch an image about solar conditions.
-!dmr - Get DMR ID from callsign, or vice-versa
-!morse - Convert input text to morse code.
-!demorse - Convert morse code to text.
+!dmr - Usage: !dmr <callsign/dmrid> - Get DMR ID from callsign, or vice-versa
+!morse - Usage: !morse <message> - Convert input text to morse code.
+!demorse - Usage: !demorse <message in -- --- .-. ... . / -.-. --- -.. .> 
+Convert morse code input to text.
+!qrz - Usage: !qrz <callsign> - Lookup callsign on qrz.com
+!dxcc - Usage: !dxcc <prefix/callsign/dxccnumber> - Lookup dxcc from
+number, callsign or prefix
 ```
 
 ## Authors
@@ -82,6 +88,8 @@ Here is an explanation of what everything is:
 | OWNERS            | The user ID of all the bot owners                                     |
 | BLACKLIST         | The user ID of all the users who can't use the bot                    |
 | STARTUP_COGS      | The cogs that should be automatically loaded when you start the bot   |
+
+Then there are various API keys that I have added for other features.
 
 ## How to start
 

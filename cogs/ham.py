@@ -52,7 +52,7 @@ class ham(commands.Cog, name="ham"):
     @commands.command(name="dmr", aliases=["dmrid"])
     async def dmr(self, context, *, args):
         """
-        Get DMR ID from callsign, or vice-versa
+        Usage: !dmr <callsign/dmrid> - Get DMR ID from callsign, or vice-versa
         """
         cleanargs=re.sub(r'[^a-zA-Z0-9]','', args)
         try:
@@ -120,7 +120,7 @@ class ham(commands.Cog, name="ham"):
     @commands.command(name="morse")
     async def morse(self, context, *, args):
         """
-        Convert input text to morse code.
+        Usage: !morse <message> - Convert input text to morse code.
         """
         cleanargs=re.sub(r'[^\x00-\x7F]+',' ', args)
         cleanargs=urllib.parse.quote(cleanargs, safe='')
@@ -135,7 +135,8 @@ class ham(commands.Cog, name="ham"):
     @commands.command(name="demorse")
     async def demorse(self, context, *, args):
         """
-        Convert morse code to text.
+        Usage: !demorse <message in -- --- .-. ... . / -.-. --- -.. .> 
+        Convert morse code input to text.
         """
         cleanargs=args.replace("/",".......")
         cleanargs=urllib.parse.quote(cleanargs, safe='')
@@ -149,7 +150,7 @@ class ham(commands.Cog, name="ham"):
     @commands.command(name="qrz", aliases=["call","lookup"])
     async def qrz(self, context, *, args):
         """
-        Lookup callsign on qrz.com
+        Usage: !qrz <callsign> - Lookup callsign on qrz.com
         """
         cleanargs=re.sub(r'[^a-zA-Z0-9]','', args)
         qrzpassword=urllib.parse.quote(config.QRZ_PASSWORD, safe='')
@@ -209,7 +210,8 @@ class ham(commands.Cog, name="ham"):
     @commands.command(name="dxcc", aliases=["country"])
     async def dxcc(self, context, *, args):
         """
-        Lookup dxcc from number, callsign or prefix
+        Usage: !dxcc <prefix/callsign/dxccnumber> - Lookup dxcc from
+        number, callsign or prefix
         """
         cleanargs=re.sub(r'[^a-zA-Z0-9]','', args)
         qrzpassword=urllib.parse.quote(config.QRZ_PASSWORD, safe='')
@@ -256,16 +258,18 @@ class ham(commands.Cog, name="ham"):
             try:
                 embed.add_field(
                     name="Timezone:",
-                    value=f"UTC {int(response['QRZDatabase']['DXCC']['timezone']):+}",
+                    value=f"UTC {float(response['QRZDatabase']['DXCC']['timezone']):+.1f}",
                     inline=True
                 )
             except KeyError:
                 pass
             embed.add_field(
                 name="Coordinates:",
-                value=f"Lat: {response['QRZDatabase']['DXCC']['lat']}, Lon: {response['QRZDatabase']['DXCC']['lon']}",
+                value=f"Lon: {response['QRZDatabase']['DXCC']['lon']}, Lat: {response['QRZDatabase']['DXCC']['lat']}",
                 inline=True
             )
+#            print(f"https://maps.geoapify.com/v1/staticmap?style=dark-matter-purple-roads&width=400&height=320&center=lonlat:{response['QRZDatabase']['DXCC']['lon']},{response['QRZDatabase']['DXCC']['lat']}&zoom=2&scaleFactor=1&marker=lonlat:{response['QRZDatabase']['DXCC']['lon']},{response['QRZDatabase']['DXCC']['lat']};type:awesome;color:%23e01401&apiKey={config.GEOAPIFY_API_KEY}")
+#            embed.set_image(url=f"https://maps.geoapify.com/v1/staticmap?style=dark-matter-purple-roads&width=400&height=320&center=lonlat:{response['QRZDatabase']['DXCC']['lon']},{response['QRZDatabase']['DXCC']['lat']}&zoom=2&scaleFactor=1&marker=lonlat:{response['QRZDatabase']['DXCC']['lon']},{response['QRZDatabase']['DXCC']['lat']};type:awesome&apiKey={config.GEOAPIFY_API_KEY}")
         except:
             embed=discord.Embed(
                 title=f":warning: DXCC error:",
