@@ -89,7 +89,7 @@ class ham(commands.Cog, name="ham"):
                     title=f"DMR ID result:",
                     color=0x00FF00
                 )
-                embed.set_thumbnail(url=f"https://cdn.discordapp.com/emojis/829926368824918046.png")
+                embed.set_thumbnail(url="https://cdn.discordapp.com/emojis/829926368824918046.png")
                 embed.add_field(
                     name="Callsign:",
                     value=response['results'][0]['callsign'],

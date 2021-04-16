@@ -178,8 +178,8 @@ class general(commands.Cog, name="general"):
     @commands.command(name="btc", aliases=["bitcoin"])
     async def bitcoin(self, context,*,args=""):
         """
-        Usage: !bitcoin <currency> Gets the current price of bitcoin.
-        defaults to USD, but can take other currency as an argument
+        Usage: !bitcoin <currency> - Gets the current price of bitcoin.
+        defaults to USD, can specify currency with ISO 4217 currency codes
         """
         if len(args)==3:
             cleanargs=re.sub(r'[^a-zA-Z0-9]','', args)
@@ -196,16 +196,23 @@ class general(commands.Cog, name="general"):
             converted = await self.convertcurrency(rate, "USD", cur)
             cursymbol = CurrencySymbols.get_symbol(cur)
             embed = discord.Embed(
-                title=":coin: Bitcoin",
-                description=f"Bitcoin price is: {cursymbol}{converted:,.4f} {cur}",
+                title="Bitcoin",
                 color=0x00FF00
             )
+            embed.add_field(
+                name="Bitcoin price is:",
+                value=f"{cursymbol}{converted:,.4f} {cur}",
+                inline=False
+            )
+            embed.set_thumbnail(url="https://upload.wikimedia.org/wikipedia/commons/thumb/4/46/Bitcoin.svg/256px-Bitcoin.svg.png")
             await context.send(embed=embed)
 
     @commands.command(name="doge", aliases=["dogecoin"])
     async def dogecoin(self, context,*,args=""):
         """
-        Get the current price of dogecoin in USD *TO THE MOON*.
+        usage: !doge <currency> - Gets the current price of dogecoin.
+        defaults to USD, can specify currency with ISO 4217 currency codes.
+        *TO THE MOON*.
         """
         if len(args)==3:
             cleanargs=re.sub(r'[^a-zA-Z0-9]','', args)
@@ -223,9 +230,21 @@ class general(commands.Cog, name="general"):
             cursymbol = CurrencySymbols.get_symbol(cur)
             embed = discord.Embed(
                 title="<:doge:829928818508431400> Dogecoin to the moon :rocket:",
-                description=f"Dogecoin price is: {cursymbol}{converted:,.7f} {cur}",
                 color=0x00FF00
             )
+            if args.lower()=="doge":                   
+                embed.add_field(
+                    name="Dogecoin price is:",
+                    value="1 doge = 1 doge",
+                    inline=False
+                )
+            else:
+                embed.add_field(
+                    name="Dogecoin price is:",
+                    value=f"{cursymbol}{converted:,.7f} {cur}",
+                    inline=False
+                )
+            embed.set_thumbnail(url="https://cdn.discordapp.com/emojis/829928818508431400.png")
             await context.send(embed=embed)
 
     @commands.command(name="cat", aliases=["kitty","neko"])
