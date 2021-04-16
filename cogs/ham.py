@@ -153,13 +153,13 @@ class ham(commands.Cog, name="ham"):
         """
         cleanargs=re.sub(r'[^a-zA-Z0-9]','', args)
         qrzpassword=urllib.parse.quote(config.QRZ_PASSWORD, safe='')
-        keyurl = f"http://xmldata.qrz.com/xml/current/?username={config.QRZ_USERNAME};password={qrzpassword}"
+        keyurl = f"https://xmldata.qrz.com/xml/current/?username={config.QRZ_USERNAME};password={qrzpassword}"
         async with aiohttp.ClientSession() as session:
             raw_response = await session.get(keyurl)
             response = await raw_response.text()
             response = xmltodict.parse(response)
             sessionkey=response['QRZDatabase']['Session']['Key']
-            url = f"http://xmldata.qrz.com/xml/current/?s={sessionkey};callsign={cleanargs.upper()}"
+            url = f"https://xmldata.qrz.com/xml/current/?s={sessionkey};callsign={cleanargs.upper()}"
             raw_response = await session.get(url)
             response = await raw_response.text()
             response = xmltodict.parse(response)
@@ -213,13 +213,13 @@ class ham(commands.Cog, name="ham"):
         """
         cleanargs=re.sub(r'[^a-zA-Z0-9]','', args)
         qrzpassword=urllib.parse.quote(config.QRZ_PASSWORD, safe='')
-        keyurl = f"http://xmldata.qrz.com/xml/current/?username={config.QRZ_USERNAME};password={qrzpassword}"
+        keyurl = f"https://xmldata.qrz.com/xml/current/?username={config.QRZ_USERNAME};password={qrzpassword}"
         async with aiohttp.ClientSession() as session:
             raw_response = await session.get(keyurl)
             response = await raw_response.text()
             response = xmltodict.parse(response)
             sessionkey=response['QRZDatabase']['Session']['Key']
-            url = f"http://xmldata.qrz.com/xml/current/?s={sessionkey};dxcc={cleanargs.upper()}"
+            url = f"https://xmldata.qrz.com/xml/current/?s={sessionkey};dxcc={cleanargs.upper()}"
             raw_response = await session.get(url)
             response = await raw_response.text()
             response = xmltodict.parse(response)
