@@ -147,7 +147,7 @@ class ham(commands.Cog, name="ham"):
             response = json.loads(response)
         await context.send(response['plaintext'])
 
-    @commands.command(name="qrz", aliases=["call","lookup"])
+    @commands.command(name="qrz", aliases=["call","lookup","dox"])
     async def qrz(self, context, *, args):
         """
         Usage: !qrz <callsign> - Lookup callsign on qrz.com
