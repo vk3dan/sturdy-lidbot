@@ -179,7 +179,7 @@ class general(commands.Cog, name="general"):
     async def bitcoin(self, context,*,args=""):
         """
         Usage: !bitcoin <currency> - Gets the current price of bitcoin.
-        defaults to USD, can specify currency with ISO 4217 currency codes
+        output defaults to USD.
         """
         if len(args)==3:
             cleanargs=re.sub(r'[^a-zA-Z0-9]','', args)
@@ -211,8 +211,7 @@ class general(commands.Cog, name="general"):
     async def dogecoin(self, context,*,args=""):
         """
         usage: !doge <currency> - Gets the current price of dogecoin.
-        defaults to USD, can specify currency with ISO 4217 currency codes.
-        *TO THE MOON*.
+        output defaults to USD *TO THE MOON*.
         """
         if len(args)==3:
             cleanargs=re.sub(r'[^a-zA-Z0-9]','', args)
