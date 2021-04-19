@@ -117,7 +117,7 @@ class ham(commands.Cog, name="ham"):
                 )
             await context.send(embed=embed)
 
-    @commands.command(name="morse")
+    @commands.command(name="morse", aliases=["cw"])
     async def morse(self, context, *, args):
         """
         Usage: !morse <message> - Convert input text to morse code.
@@ -132,7 +132,7 @@ class ham(commands.Cog, name="ham"):
         outputtext = response['morsecode'].replace(".......","/")
         await context.send(outputtext)
 
-    @commands.command(name="demorse")
+    @commands.command(name="demorse", aliases=["unmorse","uncw"])
     async def demorse(self, context, *, args):
         """
         Usage: !demorse <message in -- --- .-. ... . / -.-. --- -.. .> 
@@ -197,6 +197,11 @@ class ham(commands.Cog, name="ham"):
             embed.add_field(
                 name="Country:",
                 value=response['QRZDatabase']['Callsign']['country'],
+                inline=True
+            )
+            embed.add_field(
+                name="Link to QRZ.com profile:",
+                value=f"[Click Here](https://www.qrz.com/db/{cleanargs.upper()})",
                 inline=True
             )
         except:
