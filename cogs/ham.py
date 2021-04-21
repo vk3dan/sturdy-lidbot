@@ -184,7 +184,7 @@ class ham(commands.Cog, name="ham"):
             embed.set_thumbnail(url=f"attachment://qrz.png")
             embed.add_field(
                 name="Callsign:",
-                value=response['QRZDatabase']['Callsign']['call'],
+                value=f"[{response['QRZDatabase']['Callsign']['call']}](https://www.qrz.com/db/{response['QRZDatabase']['Callsign']['call']})",
                 inline=False
             )
             embed.add_field(
@@ -208,11 +208,6 @@ class ham(commands.Cog, name="ham"):
             embed.add_field(
                 name="Country:",
                 value=response['QRZDatabase']['Callsign']['country'],
-                inline=True
-            )
-            embed.add_field(
-                name="Link to QRZ.com profile:",
-                value=f"[Click Here](https://www.qrz.com/db/{cleanargs.upper()})",
                 inline=True
             )
         except:
