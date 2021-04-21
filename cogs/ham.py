@@ -123,13 +123,15 @@ class ham(commands.Cog, name="ham"):
         Usage: !morse <message> - Convert input text to morse code.
         """
         cleanargs=re.sub(r'[^\x00-\x7F]+',' ', args)
-        cleanargs=urllib.parse.quote(cleanargs, safe='')
-        url = f"http://www.morsecode-api.de/encode?string={cleanargs}"
-        async with aiohttp.ClientSession() as session:
-            raw_response = await session.get(url)
-            response = await raw_response.text()
-            response = json.loads(response)
-        outputtext = response['morsecode'].replace(".......","/")
+        outputtext=""
+        with open("resources/morse.json") as file:
+            morsejson = json.load(file)
+        for char in cleanargs.lower():
+            try:
+                outputtext += morsejson[char]
+            except KeyError:
+                outputtext += ":shrug:"
+            outputtext += " "
         await context.send(outputtext)
 
     @commands.command(name="demorse", aliases=["unmorse","uncw"])
@@ -138,14 +140,23 @@ class ham(commands.Cog, name="ham"):
         Usage: !demorse <message in -- --- .-. ... . / -.-. --- -.. .> 
         Convert morse code input to text.
         """
-        cleanargs=args.replace("/",".......")
-        cleanargs=urllib.parse.quote(cleanargs, safe='')
-        url = f"http://www.morsecode-api.de/decode?string={cleanargs}"
-        async with aiohttp.ClientSession() as session:
-            raw_response = await session.get(url)
-            response = await raw_response.text()
-            response = json.loads(response)
-        await context.send(response['plaintext'])
+        outputtext=""
+        inputmorse=args.split("/")
+        inputmorse = [word.split() for word in inputmorse]
+        with open("resources/morse.json") as file:
+            morsejson = json.load(file)
+        morsejson.pop(" ")
+        textdict={}
+        for key, value in morsejson.items():
+            textdict[value] = key
+        for word in inputmorse:
+            for char in word:
+                try:
+                    outputtext += textdict[char]
+                except KeyError:
+                    outputtext += ":shrug:"
+            outputtext += " "
+        await context.send(outputtext)
 
     @commands.command(name="qrz", aliases=["call","lookup","dox"])
     async def qrz(self, context, *, args):
