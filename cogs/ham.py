@@ -1,4 +1,4 @@
-import os, sys, discord, platform, random, aiohttp, json, re, xmltodict
+import os, sys, discord, platform, random, aiohttp, json, re, xmltodict, time, csv, wget
 from discord.ext import commands
 import urllib.parse
 if not os.path.isfile("config.py"):
@@ -164,6 +164,32 @@ class ham(commands.Cog, name="ham"):
         Usage: !qrz <callsign> - Lookup callsign on qrz.com
         """
         cleanargs=re.sub(r'[^a-zA-Z0-9]','', args)
+        redditurl = "https://raw.githubusercontent.com/molo1134/qrmbot/master/lib/nicks.csv"
+        redditfile = "resources/nicks.csv"
+        current_time = time.time()
+        if os.path.isfile(redditfile):
+            print("nicks.csv found")
+            creation_time = os.path.getctime(redditfile)
+            if (current_time - creation_time) // (24 * 3600) >= 28:
+                print("file over 28 days old, fetching current version (<1MB)\n")
+                os.unlink(redditfile)
+                wget.download(redditurl, redditfile)
+            else:
+                print("nicks.csv current\n")
+        else:
+            print("fetching reddit hams csv file (<1MB)\n")
+            wget.download(redditurl, redditfile)
+        with open(redditfile) as rf:
+            csv_rf = csv.reader(rf, delimiter=',')
+            redditor=0
+            redditname=""
+            for row in csv_rf:
+                if row[0].upper()==cleanargs.upper():
+                    redditor=1
+                    redditname=row[2]
+                    break
+                else:
+                    redditor=0
         qrzpassword=urllib.parse.quote(config.QRZ_PASSWORD, safe='')
         keyurl = f"https://xmldata.qrz.com/xml/current/?username={config.QRZ_USERNAME};password={qrzpassword}"
         async with aiohttp.ClientSession() as session:
@@ -180,7 +206,10 @@ class ham(commands.Cog, name="ham"):
                 title=f"QRZ lookup result:",
                 color=0x00FF00
             )
-            qrzlogo=file = discord.File("images/qrz.png", filename="qrz.png")
+            if redditor==1:
+                qrzlogo=file = discord.File("images/qrz+reddit.png", filename="qrz.png")
+            else:
+                qrzlogo=file = discord.File("images/qrz.png", filename="qrz.png")
             embed.set_thumbnail(url=f"attachment://qrz.png")
             embed.add_field(
                 name="Callsign:",
@@ -192,6 +221,14 @@ class ham(commands.Cog, name="ham"):
                 value=f"{response['QRZDatabase']['Callsign']['fname']} {response['QRZDatabase']['Callsign']['name']}",
                 inline=False
             )
+            if redditor==1 and redditname!="":
+                embed.add_field(
+                    name="Reddit:",
+                    value=redditname[1:],
+                    inline=False
+                )
+            else:
+                pass
             embed.add_field(
                 name="QTH:",
                 value=response['QRZDatabase']['Callsign']['addr2'],            

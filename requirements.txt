@@ -2,3 +2,5 @@ aiohttp
 discord.py
 wolframalpha
 currency-symbols
+wget
+xmltodict
