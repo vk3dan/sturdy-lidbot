@@ -1,6 +1,7 @@
 import os, sys, discord, platform, random, aiohttp, json, re, wolframalpha
 from discord.ext import commands
 from currency_symbols import CurrencySymbols
+from geopy.geocoders import Nominatim
 if not os.path.isfile("config.py"):
     sys.exit("'config.py' not found! Please add it and try again.")
 else:
@@ -348,9 +349,8 @@ class general(commands.Cog, name="general"):
         Fetch the weather for the place requested.
         """
         cleanargs=re.sub(r'[^a-zA-Z0-9\, -]','', args)
-        if re.match(".* ..$",cleanargs):
-            cleanargs=f"{cleanargs[:-3]},{cleanargs[-3:]}"
-        url = f"https://api.openweathermap.org/data/2.5/weather?q={cleanargs}&appid="+config.OPENWEATHER_API_KEY
+        location=await self.geocode(cleanargs)
+        url = f"https://api.openweathermap.org/data/2.5/onecall?lat={location['lat']}&lon={location['lon']}&exclude=minutely,hourly&appid="+config.OPENWEATHER_API_KEY
         print(url)
         # Async HTTP request
         async with aiohttp.ClientSession() as session:
@@ -358,14 +358,14 @@ class general(commands.Cog, name="general"):
             response = await raw_response.text()
             response = json.loads(response)
             try:
-                tempc = round(float(response['main']['temp']-272.15),1)
-                tempf = round(float(response['main']['temp']*1.8-459.67),1)
-                flc = round(float(response['main']['feels_like']-272.15),1)
-                flf = round(float(response['main']['feels_like']*1.8-459.67),1)
-                minc = round(float(response['main']['temp_min']-272.15),1)
-                minf = round(float(response['main']['temp_min']*1.8-459.67),1)
-                maxc = round(float(response['main']['temp_max']-272.15),1)
-                maxf = round(float(response['main']['temp_max']*1.8-459.67),1)
+                tempc = round(float(response['current']['temp']-272.15),1)
+                tempf = round(float(response['current']['temp']*1.8-459.67),1)
+                flc = round(float(response['current']['feels_like']-272.15),1)
+                flf = round(float(response['current']['feels_like']*1.8-459.67),1)
+                minc = round(float(response['daily'][0]['temp']['min']-272.15),1)
+                minf = round(float(response['daily'][0]['temp']['min']*1.8-459.67),1)
+                maxc = round(float(response['daily'][0]['temp']['max']-272.15),1)
+                maxf = round(float(response['daily'][0]['temp']['max']*1.8-459.67),1)
             except:
                 embed = discord.Embed(
                     title=":warning: Weather error",
@@ -374,17 +374,17 @@ class general(commands.Cog, name="general"):
                 )
             else:
                 embed = discord.Embed(
-                    title=f":sun_with_face: Weather for {response['name']}, {response['sys']['country']}",
-                    description=f"**Current Conditions:** {response['weather'][0]['description'].capitalize()}",
+                    title=f":sun_with_face: Weather for {location['display_name']}",
+                    description=f"**Current Conditions:** {response['current']['weather'][0]['description'].capitalize()}",
                     color=0x00FF00
                 )
-                embed.set_thumbnail(url=f"http://openweathermap.org/img/wn/{response['weather'][0]['icon']}@2x.png")
+                embed.set_thumbnail(url=f"http://openweathermap.org/img/wn/{response['current']['weather'][0]['icon']}@2x.png")
                 embed.add_field(name="Temperature:", value=f"{tempc} ºC ({tempf} ºF)", inline=True)
                 embed.add_field(name="*Feels like:*", value=f"*{flc} ºC ({flf} ºF)*", inline=True)
-                embed.add_field(name="Humidity:", value=f"{response['main']['humidity']}%", inline=True)
+                embed.add_field(name="Humidity:", value=f"{response['current']['humidity']}%", inline=True)
                 embed.add_field(name="Daily Minimum:", value=f"{minc} ºC ({minf} ºF)", inline=True)
                 embed.add_field(name="Daily Maximum:", value=f"{maxc} ºC ({maxf} ºF)", inline=True)
-                embed.add_field(name="Pressure:", value=f"{response['main']['pressure']} hPa", inline=True)
+                embed.add_field(name="Pressure:", value=f"{response['current']['pressure']} hPa", inline=True)
             await context.send(embed=embed)
 
     @commands.command(name="ask", aliases=["wolfram"])
@@ -465,6 +465,15 @@ class general(commands.Cog, name="general"):
             response = json.loads(response)
             answer = float(amount)*float(response['conversion_rates'][(tocurrency)])
             return answer
+
+    async def geocode(self, location):
+        geo = Nominatim(user_agent="lidbot")
+        try:
+            output = geo.geocode(location).raw
+        except:
+            return 1
+        return output
+
 
 def setup(bot):
     bot.add_cog(general(bot))

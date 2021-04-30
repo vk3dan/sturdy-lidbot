@@ -4,3 +4,4 @@ wolframalpha
 currency-symbols
 wget
 xmltodict
+geopy
