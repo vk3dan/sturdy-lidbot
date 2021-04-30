@@ -350,6 +350,14 @@ class general(commands.Cog, name="general"):
         """
         cleanargs=re.sub(r'[^a-zA-Z0-9\, -]','', args)
         location=await self.geocode(cleanargs)
+        if location==1:    
+            embed = discord.Embed(
+                    title=":warning: Weather error",
+                    description=f"place {cleanargs} not found",
+                color=0xFF0000
+                )
+            await context.send(embed=embed)
+            return 1
         url = f"https://api.openweathermap.org/data/2.5/onecall?lat={location['lat']}&lon={location['lon']}&exclude=minutely,hourly&appid="+config.OPENWEATHER_API_KEY
         print(url)
         # Async HTTP request
