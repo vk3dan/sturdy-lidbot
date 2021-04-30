@@ -377,7 +377,7 @@ class general(commands.Cog, name="general"):
             except:
                 embed = discord.Embed(
                     title=":warning: Weather error",
-                    description=f"place {cleanargs} not found",
+                    description=f"error occurred fetching weather data",
                 color=0xFF0000
                 )
             else:
