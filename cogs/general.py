@@ -405,7 +405,7 @@ class general(commands.Cog, name="general"):
                 embed.add_field(name="Daily Minimum:", value=f"{minc} ºC ({minf} ºF)", inline=True)
                 embed.add_field(name="Daily Maximum:", value=f"{maxc} ºC ({maxf} ºF)", inline=True)
                 embed.add_field(name="Pressure:", value=f"{response['current']['pressure']} hPa", inline=True)
-                embed.add_field(name="Wind:", value=f"{windspeedkmh} km/h | {windspeedmph} mph {winddirection}{gusts}", inline=True)
+                embed.add_field(name="Wind:", value=f"{winddirection} @ {windspeedkmh} km/h | {windspeedmph} mph{gusts}", inline=True)
                 try:
                     embed.add_field(name=f"**ALERT: {response['alerts']['event']}** from {response['alerts']['sender_name']}", value=f"{response['alerts']['description']}", inline=False)
                 except:
