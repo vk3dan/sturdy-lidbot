@@ -107,7 +107,7 @@ class general(commands.Cog, name="general"):
             inline=True
         )
         embed.set_footer(
-            text=f"Pong request by {context.message.author}"
+            text=f"Pong requested by {context.message.author}"
         )
         await context.send(embed=embed)
 
@@ -125,7 +125,7 @@ class general(commands.Cog, name="general"):
             inline=True
         )
         embed.set_footer(
-            text=f"Dong request by {context.message.author}"
+            text=f"Dong requested by {context.message.author}"
         )
         await context.send(embed=embed)
 
@@ -194,8 +194,17 @@ class general(commands.Cog, name="general"):
             response = await raw_response.text()
             response = json.loads(response)
             rate = response['bpi']['USD']['rate'].replace(',', '')
-            converted = await self.convertcurrency(rate, "USD", cur)
-            cursymbol = CurrencySymbols.get_symbol(cur)
+            try:
+                converted = await self.convertcurrency(rate, "USD", cur)
+                cursymbol = CurrencySymbols.get_symbol(cur)
+            except:
+                embed = discord.Embed(
+                    title=":warning: Bitcoin Error",
+                    description="Currency error: check that you are requesting correct\nISO 4217 currency code",
+                    color=0xFF0000
+                )
+                await context.send(embed=embed)
+                return 1
             embed = discord.Embed(
                 title="Bitcoin",
                 color=0x00FF00
@@ -226,8 +235,17 @@ class general(commands.Cog, name="general"):
             response = await raw_response.text()
             response = json.loads(response)
             rate = response['data']['prices'][0]['price']
-            converted = await self.convertcurrency(rate, "USD", cur)
-            cursymbol = CurrencySymbols.get_symbol(cur)
+            try:
+                converted = await self.convertcurrency(rate, "USD", cur)
+                cursymbol = CurrencySymbols.get_symbol(cur)
+            except:
+                embed = discord.Embed(
+                    title=":warning: Doge Error",
+                    description="Currency error: check that you are requesting correct\nISO 4217 currency code",
+                    color=0xFF0000
+                )
+                await context.send(embed=embed)
+                return 1
             embed = discord.Embed(
                 title="<:doge:829928818508431400> Dogecoin to the moon :rocket:",
                 color=0x00FF00
