@@ -374,6 +374,10 @@ class general(commands.Cog, name="general"):
                 minf = round(float(response['daily'][0]['temp']['min']*1.8-459.67),1)
                 maxc = round(float(response['daily'][0]['temp']['max']-272.15),1)
                 maxf = round(float(response['daily'][0]['temp']['max']*1.8-459.67),1)
+                windspeedms = round(float(response['current']['wind_speed']),1)
+                windspeedkmh = round(windspeedms * 3.6,1)
+                windspeedmph = round(windspeedms * 2.236936,1)
+                winddirection = await self.direction_from_degrees(int(response['current']['wind_deg']))
             except:
                 embed = discord.Embed(
                     title=":warning: Weather error",
@@ -393,6 +397,7 @@ class general(commands.Cog, name="general"):
                 embed.add_field(name="Daily Minimum:", value=f"{minc} ºC ({minf} ºF)", inline=True)
                 embed.add_field(name="Daily Maximum:", value=f"{maxc} ºC ({maxf} ºF)", inline=True)
                 embed.add_field(name="Pressure:", value=f"{response['current']['pressure']} hPa", inline=True)
+                embed.add_field(name="Wind:", value=f"{windspeedkmh} km/h | {windspeedmph} mph {winddirection}")
             await context.send(embed=embed)
 
     @commands.command(name="ask", aliases=["wolfram"])
@@ -416,9 +421,9 @@ class general(commands.Cog, name="general"):
         else:
             embed = discord.Embed(
                 title=":teacher: Wolfram|Alpha",
-                description=f"**Answer:** {response}",
                 color=0x00FF00
             )
+            embed.add_field(name="My Answer:", value=response, inline=True)
         await context.send(embed=embed)
 
     @commands.command(name="exchange", aliases=["convertcurrency", "currency"])
@@ -481,6 +486,11 @@ class general(commands.Cog, name="general"):
         except:
             return 1
         return output
+
+    async def direction_from_degrees(self, degrees):
+        directions = ["N", "NE", "E", "SE", "S", "SW", "W", "NW", "N"]
+        compass_direction = round(degrees / 45)
+        return directions[compass_direction]
 
 
 def setup(bot):
