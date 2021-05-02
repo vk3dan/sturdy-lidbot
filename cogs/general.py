@@ -378,6 +378,14 @@ class general(commands.Cog, name="general"):
                 windspeedkmh = round(windspeedms * 3.6,1)
                 windspeedmph = round(windspeedms * 2.236936,1)
                 winddirection = await self.direction_from_degrees(int(response['current']['wind_deg']))
+                gusts = ""
+                try:
+                    gustspeedms = round(float(response['current']['wind_gust']),1)
+                    gustspeedkmh = round(gustspeedms * 3.6,1)
+                    gustspeedmph = round(gustspeedms * 2.246936,1)
+                    gusts = f", Gusts up to {gustspeedkmh} km/h | {gustspeedmph} mph"
+                except:
+                    pass
             except:
                 embed = discord.Embed(
                     title=":warning: Weather error",
@@ -397,7 +405,11 @@ class general(commands.Cog, name="general"):
                 embed.add_field(name="Daily Minimum:", value=f"{minc} ºC ({minf} ºF)", inline=True)
                 embed.add_field(name="Daily Maximum:", value=f"{maxc} ºC ({maxf} ºF)", inline=True)
                 embed.add_field(name="Pressure:", value=f"{response['current']['pressure']} hPa", inline=True)
-                embed.add_field(name="Wind:", value=f"{windspeedkmh} km/h | {windspeedmph} mph {winddirection}")
+                embed.add_field(name="Wind:", value=f"{windspeedkmh} km/h | {windspeedmph} mph {winddirection}{gusts}", inline=True)
+                try:
+                    embed.add_field(name=f"**ALERT: {response['alerts']['event']}** from {response['alerts']['sender_name']}", value=f"{response['alerts']['description']}", inline=False)
+                except:
+                    pass
             await context.send(embed=embed)
 
     @commands.command(name="ask", aliases=["wolfram"])
@@ -488,8 +500,8 @@ class general(commands.Cog, name="general"):
         return output
 
     async def direction_from_degrees(self, degrees):
-        directions = ["N", "NE", "E", "SE", "S", "SW", "W", "NW", "N"]
-        compass_direction = round(degrees / 45)
+        directions = ["N", "NNE", "NE", "ENE", "E", "ESE", "SE", "SSE", "S", "SSW", "SW", "WSW", "W", "WNW", "NW", "NNW", "N"]
+        compass_direction = round(degrees / 22.5)
         return directions[compass_direction]
 
 
