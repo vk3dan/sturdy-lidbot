@@ -55,11 +55,11 @@ intents = discord.Intents.default()
 
 bot = Bot(command_prefix=config.BOT_PREFIX, intents=intents, case_insensitive=True)
 
-statuses = ['like a lid', 'with a baofeng', 'with myself', 'With my ding-ding',
+statuses = ['like a lid', 'with a baofeng', 'with myself', 'with my ding-ding',
     'you.', 'myself', 'with fireworks in garage', 'with matches', 'guitar', 
 	'tag', 'ball', 'hardball', 'the fool', 'a doctor on tv', 'around', 'VHS tapes',
 	'hard to get', 'basketball', 'football', 'stupid games', 'with SSTV', 'on Brandmeister',
-	'on TGIF', 'on 98003', 'Gonk Simulator', 'THE GAME. You just lost.']
+	'on TGIF', 'on 98003', 'Gonk Simulator', 'THE GAME. You just lost.', 'with velcro']
 
 gonksimeditions = ['', '2', '3', '- Remastered', '2020: Gonkdemic', '2021', '2022',
 	'2047: Gonkout', 'for kids', 'with bacon'] 
