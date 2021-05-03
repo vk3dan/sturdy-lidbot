@@ -13,7 +13,7 @@ This is a template to create your own discord bot in python.
 Version: 2.3
 """
 
-import discord, asyncio, os, platform, sys
+import discord, asyncio, os, platform, sys, random
 from discord.ext.commands import Bot
 from discord.ext import commands
 if not os.path.isfile("config.py"):
@@ -66,22 +66,15 @@ async def on_ready():
 	print("-------------------")
 
 # Setup the game status task of the bot
+
+statuses = ['like a lid', 'with a baofeng', 'with myself', 'With my ding-ding',
+    'you.', 'myself', 'with fireworks in garage', 'with matches', 'guitar', 
+	'tag', 'ball', 'hardball', 'the fool', 'a doctor on tv', 'around', 'VHS tapes']
+
 async def status_task():
-	while True:
-		await bot.change_presence(activity=discord.Game("like a lid"))
-		await asyncio.sleep(60)
-		await bot.change_presence(activity=discord.Game("with a baofeng"))
-		await asyncio.sleep(60)
-		await bot.change_presence(activity=discord.Game("with myself"))
-		await asyncio.sleep(60)
-		await bot.change_presence(activity=discord.Game("with my ding ding"))
-		await asyncio.sleep(60)
-		await bot.change_presence(activity=discord.Game("you"))
-		await asyncio.sleep(60)
-		await bot.change_presence(activity=discord.Game("myself"))
-		await asyncio.sleep(60)
-		await bot.change_presence(activity=discord.Game("with fireworks in garage"))
-		await asyncio.sleep(60)
+	while True: 
+		await bot.change_presence(activity=discord.Game(statuses[random.randint(0, len(statuses))]))
+		await asyncio.sleep(45)
 
 # Removes the default help command of discord.py to be able to create our custom help command.
 bot.remove_command("help")
