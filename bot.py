@@ -56,7 +56,7 @@ intents = discord.Intents.default()
 bot = Bot(command_prefix=config.BOT_PREFIX, intents=intents, case_insensitive=True)
 
 statuses = ['like a lid', 'with a baofeng', 'with myself', 'with my ding-ding',
-    'you.', 'myself', 'with fireworks in garage', 'with matches', 'guitar', 
+    'you.', 'myself', 'with fireworks in garage', 'with matches', 'guitar', 'sportsball',
 	'tag', 'ball', 'hardball', 'the fool', 'a doctor on tv', 'around', 'VHS tapes',
 	'hard to get', 'basketball', 'football', 'stupid games', 'with SSTV', 'on Brandmeister',
 	'on TGIF', 'on 98003', 'Gonk Simulator', 'THE GAME. You just lost.', 'with velcro']
