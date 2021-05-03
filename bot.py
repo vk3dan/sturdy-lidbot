@@ -55,6 +55,12 @@ intents = discord.Intents.default()
 
 bot = Bot(command_prefix=config.BOT_PREFIX, intents=intents, case_insensitive=True)
 
+statuses = ['like a lid', 'with a baofeng', 'with myself', 'With my ding-ding',
+    'you.', 'myself', 'with fireworks in garage', 'with matches', 'guitar', 
+	'tag', 'ball', 'hardball', 'the fool', 'a doctor on tv', 'around', 'VHS tapes',
+	'hard to get', 'basketball', 'football', 'stupid games', 'with SSTV', 'on Brandmeister',
+	'on TGIF', 'on 98003']
+
 # The code in this even is executed when the bot is ready
 @bot.event
 async def on_ready():
@@ -67,14 +73,12 @@ async def on_ready():
 
 # Setup the game status task of the bot
 
-statuses = ['like a lid', 'with a baofeng', 'with myself', 'With my ding-ding',
-    'you.', 'myself', 'with fireworks in garage', 'with matches', 'guitar', 
-	'tag', 'ball', 'hardball', 'the fool', 'a doctor on tv', 'around', 'VHS tapes']
-
 async def status_task():
-	while True: 
-		await bot.change_presence(activity=discord.Game(statuses[random.randint(0, len(statuses))]))
-		await asyncio.sleep(45)
+	await bot.wait_until_ready()
+	while True:
+		currentstatus=statuses[random.randint(0, len(statuses))]
+		await bot.change_presence(activity=discord.Game(currentstatus))
+		await asyncio.sleep(60)
 
 # Removes the default help command of discord.py to be able to create our custom help command.
 bot.remove_command("help")
