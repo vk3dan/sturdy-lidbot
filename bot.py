@@ -59,7 +59,10 @@ statuses = ['like a lid', 'with a baofeng', 'with myself', 'With my ding-ding',
     'you.', 'myself', 'with fireworks in garage', 'with matches', 'guitar', 
 	'tag', 'ball', 'hardball', 'the fool', 'a doctor on tv', 'around', 'VHS tapes',
 	'hard to get', 'basketball', 'football', 'stupid games', 'with SSTV', 'on Brandmeister',
-	'on TGIF', 'on 98003']
+	'on TGIF', 'on 98003', 'Gonk Simulator', 'THE GAME. You just lost.']
+
+gonksimeditions = ['', '2', '3', '- Remastered', '2020: Gonkdemic', '2021', '2022',
+	'2047: Gonkout', 'for kids', 'with bacon'] 
 
 # The code in this even is executed when the bot is ready
 @bot.event
@@ -77,6 +80,8 @@ async def status_task():
 	await bot.wait_until_ready()
 	while True:
 		currentstatus=statuses[random.randint(0, len(statuses))]
+		if currentstatus=="Gonk Simulator":
+			currentstatus=f"{currentstatus} {gonksimeditions[random.randint(0, len(gonksimeditions))]}"
 		await bot.change_presence(activity=discord.Game(currentstatus))
 		await asyncio.sleep(60)
 
@@ -103,7 +108,7 @@ async def on_message(message):
 	else:
 		if message.author.id not in config.BLACKLIST:
 			# Process the command if the user is not blacklisted
-			startwords=("73","73s","hi ","hey ","heya","ohaider","gm","ga","ge","gn","👋","night","later","l8r","l9r")
+			startwords=("73","73s","hi ","heya","ohaider","👋","night","later","l8r","l9r")
 			endwords=(" 73"," 73s","nini"," gn"," night"," l8r"," l9r","👋")
 			if message.content.lower().startswith(tuple(startwords)) or message.content.lower().endswith(tuple(endwords)):
 				await message.add_reaction("👋")
