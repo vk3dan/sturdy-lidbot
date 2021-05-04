@@ -61,8 +61,8 @@ statuses = ['like a lid', 'with a baofeng', 'with myself', 'with my ding-ding',
 	'hard to get', 'basketball', 'football', 'stupid games', 'with SSTV', 'on Brandmeister',
 	'on TGIF', 'on 98003', 'Gonk Simulator', 'THE GAME. You just lost.', 'with velcro']
 
-gonksimeditions = ['', '2', '3', '- Remastered', '2020: Gonkdemic', '2021', '2022',
-	'2047: Gonkout', 'for kids', 'with bacon'] 
+gonksimeditions = [' ', '2', '3', '- Remastered', '2020: Gonkdemic', '2021', '2022',
+	'2047: Gonkout', 'for kids', 'with bacon', 'for linux'] 
 
 # The code in this even is executed when the bot is ready
 @bot.event
@@ -79,9 +79,9 @@ async def on_ready():
 async def status_task():
 	await bot.wait_until_ready()
 	while True:
-		currentstatus=statuses[random.randint(0, len(statuses))]
+		currentstatus=random.choice(statuses)
 		if currentstatus=="Gonk Simulator":
-			currentstatus=f"{currentstatus} {gonksimeditions[random.randint(0, len(gonksimeditions))]}"
+			currentstatus=f"{currentstatus} {random.choice(gonksimeditions)}"
 		await bot.change_presence(activity=discord.Game(currentstatus))
 		await asyncio.sleep(60)
 
