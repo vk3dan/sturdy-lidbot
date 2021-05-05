@@ -236,7 +236,7 @@ class general(commands.Cog, name="general"):
             prices=[]
             for x in range(len(response['data']['prices'])):
                 if float(response['data']['prices'][x]['price']) > 0.0:
-                    prices.append(response['data']['prices'][x]['price'])
+                    prices.append(float(response['data']['prices'][x]['price']))
                     numprices+=1
             if numprices == 1:
                 for x in range(len(response['data']['prices'])):
@@ -250,7 +250,7 @@ class general(commands.Cog, name="general"):
                     color=0xFF0000
                 )
             else:
-                rate = sum(float(prices)) / numprices
+                rate = sum(prices) / numprices
                 exchangename="Avg from multiple exchanges"
             try:
                 converted = await self.convertcurrency(rate, "USD", cur)
