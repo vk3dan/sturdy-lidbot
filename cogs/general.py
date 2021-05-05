@@ -69,10 +69,6 @@ class general(commands.Cog, name="general"):
             url=server.icon_url
         )
         embed.add_field(
-            name="Owner",
-            value=f"{server.owner}\n{server.owner.id}"
-        )
-        embed.add_field(
             name="Server ID",
             value=server.id
         )
@@ -255,7 +251,7 @@ class general(commands.Cog, name="general"):
                 )
             else:
                 rate = sum(float(prices)) / numprices
-                exchangename="avg from multiple exchanges"
+                exchangename="Avg from multiple exchanges"
             try:
                 converted = await self.convertcurrency(rate, "USD", cur)
                 cursymbol = CurrencySymbols.get_symbol(cur)
@@ -280,7 +276,7 @@ class general(commands.Cog, name="general"):
             else:
                 embed.add_field(
                     name="Dogecoin price is:",
-                    value=f"{cursymbol}{converted:,.7f} {cur} ({exchangename})",
+                    value=f"{cursymbol}{converted:,.7f} {cur} ({exchangename.capitalize()})",
                     inline=False
                 )
             embed.set_thumbnail(url="https://cdn.discordapp.com/emojis/829928818508431400.png")
