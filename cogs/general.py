@@ -234,7 +234,20 @@ class general(commands.Cog, name="general"):
             raw_response = await session.get(url)
             response = await raw_response.text()
             response = json.loads(response)
-            rate = response['data']['prices'][0]['price']
+            rate=""
+            source=""
+            if float(response['data']['prices'][0]['price']) > 0.0:
+                    rate = response['data']['prices'][0]['price']
+                    exchangename = response['data']['prices'][0]['exchange']
+            elif float(response['data']['prices'][1]['price']) > 0.0:
+                    rate = response['data']['prices'][1]['price']
+                    exchangename = response['data']['prices'][1]['exchange']
+            else:
+                embed = discord.Embed(
+                    title=":warning: Doge Error",
+                    description="Error: API not returning expected output",
+                    color=0xFF0000
+                )
             try:
                 converted = await self.convertcurrency(rate, "USD", cur)
                 cursymbol = CurrencySymbols.get_symbol(cur)
@@ -259,7 +272,7 @@ class general(commands.Cog, name="general"):
             else:
                 embed.add_field(
                     name="Dogecoin price is:",
-                    value=f"{cursymbol}{converted:,.7f} {cur}",
+                    value=f"{cursymbol}{converted:,.7f} {cur} ({exchangename})",
                     inline=False
                 )
             embed.set_thumbnail(url="https://cdn.discordapp.com/emojis/829928818508431400.png")
