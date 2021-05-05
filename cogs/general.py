@@ -414,11 +414,14 @@ class general(commands.Cog, name="general"):
                 windspeedmph = round(windspeedms * 2.236936,1)
                 winddirection = await self.direction_from_degrees(int(response['current']['wind_deg']))
                 gusts = ""
+                windymfer=" "
                 try:
                     gustspeedms = round(float(response['current']['wind_gust']),1)
                     gustspeedkmh = round(gustspeedms * 3.6,1)
                     gustspeedmph = round(gustspeedms * 2.246936,1)
-                    gusts = f", Gusts up to {gustspeedkmh} km/h | {gustspeedmph} mph"
+                    if gustspeedkmh>90:
+                        windymfer="\n**That's one windy motherfucker!**"
+                    gusts = f", Gusts up to {gustspeedkmh} km/h | {gustspeedmph} mph{windymfer}"
                 except:
                     pass
             except:
@@ -434,11 +437,11 @@ class general(commands.Cog, name="general"):
                     color=0x00FF00
                 )
                 embed.set_thumbnail(url=f"http://openweathermap.org/img/wn/{response['current']['weather'][0]['icon']}@2x.png")
-                embed.add_field(name="Temperature:", value=f"{tempc} ºC ({tempf} ºF)", inline=True)
-                embed.add_field(name="*Feels like:*", value=f"*{flc} ºC ({flf} ºF)*", inline=True)
+                embed.add_field(name="Temperature:", value=f"{tempc} °C ({tempf} °F)", inline=True)
+                embed.add_field(name="*Feels like:*", value=f"*{flc} °C ({flf} °F)*", inline=True)
                 embed.add_field(name="Humidity:", value=f"{response['current']['humidity']}%", inline=True)
-                embed.add_field(name="Daily Minimum:", value=f"{minc} ºC ({minf} ºF)", inline=True)
-                embed.add_field(name="Daily Maximum:", value=f"{maxc} ºC ({maxf} ºF)", inline=True)
+                embed.add_field(name="Daily Minimum:", value=f"{minc} °C ({minf} °F)", inline=True)
+                embed.add_field(name="Daily Maximum:", value=f"{maxc} °C ({maxf} °F)", inline=True)
                 embed.add_field(name="Pressure:", value=f"{response['current']['pressure']} hPa", inline=True)
                 embed.add_field(name="Wind:", value=f"{winddirection} @ {windspeedkmh} km/h | {windspeedmph} mph{gusts}", inline=True)
                 try:
