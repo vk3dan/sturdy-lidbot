@@ -235,19 +235,27 @@ class general(commands.Cog, name="general"):
             response = await raw_response.text()
             response = json.loads(response)
             rate=""
-            source=""
-            if float(response['data']['prices'][0]['price']) > 0.0:
-                    rate = response['data']['prices'][0]['price']
-                    exchangename = response['data']['prices'][0]['exchange']
-            elif float(response['data']['prices'][1]['price']) > 0.0:
-                    rate = response['data']['prices'][1]['price']
-                    exchangename = response['data']['prices'][1]['exchange']
-            else:
+            exchangename=""
+            numprices=0
+            prices=[]
+            for x in range(len(response['data']['prices'])):
+                if float(response['data']['prices'][x]['price']) > 0.0:
+                    prices.append(response['data']['prices'][x]['price'])
+                    numprices+=1
+            if numprices == 1:
+                for x in range(len(response['data']['prices'])):
+                    if float(response['data']['prices'][x]['price']) > 0.0:
+                        rate = response['data']['prices'][x]['price']
+                        exchangename = response['data']['prices'][x]['exchange']
+            elif numprices == 0:
                 embed = discord.Embed(
                     title=":warning: Doge Error",
-                    description="Error: API not returning expected output",
+                    description="Error: Doge API did not provide a price",
                     color=0xFF0000
                 )
+            else:
+                rate = sum(float(prices)) / numprices
+                exchangename="avg from multiple exchanges"
             try:
                 converted = await self.convertcurrency(rate, "USD", cur)
                 cursymbol = CurrencySymbols.get_symbol(cur)
