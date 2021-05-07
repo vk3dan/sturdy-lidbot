@@ -44,9 +44,6 @@ class ham(commands.Cog, name="ham"):
             inline=True
         )
         embed.set_image(url="https://www.hamqsl.com/solarn0nbh.php?image=sdo_131")
-        embed.set_footer(
-            text=f"Request by {context.message.author}"
-        )
         await context.send(embed=embed)
 
     @commands.command(name="dmr", aliases=["dmrid"])

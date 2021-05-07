@@ -39,7 +39,7 @@ class general(commands.Cog, name="general"):
             inline=False
         )
         embed.set_footer(
-            text=f"Based on Krypton's Bot Template\nRequested by {context.message.author}"
+            text="lidbot is based on Krypton's Bot Template"
         )
         await context.send(embed=embed)
 
