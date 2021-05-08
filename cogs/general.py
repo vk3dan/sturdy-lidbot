@@ -421,7 +421,7 @@ class general(commands.Cog, name="general"):
                     gustspeedmph = round(gustspeedms * 2.246936,1)
                     if gustspeedkmh>90:
                         windymfer="\n**That's one windy motherfucker!**"
-                    gusts = f", Gusts up to {gustspeedkmh} km/h | {gustspeedmph} mph{windymfer}"
+                    gusts = f" with gusts up to {gustspeedkmh} km/h | {gustspeedmph} mph{windymfer}"
                 except:
                     pass
             except:
