@@ -317,8 +317,8 @@ class general(commands.Cog, name="general"):
             response = await raw_response.text()
             response = json.loads(response)
             try:
-                regularMarketPrice = round(float(f"{response['quoteResponse']['result'][0]['regularMarketPrice']}"),2)
-                regularMarketChange = round(float(f"{response['quoteResponse']['result'][0]['regularMarketChange']}"),2)
+                regularMarketPrice = round(float(f"{response['quoteResponse']['result'][0]['regularMarketPrice']}"),5)
+                regularMarketChange = round(float(f"{response['quoteResponse']['result'][0]['regularMarketChange']}"),5)
                 regularMarketChangePercent = round(float(f"{response['quoteResponse']['result'][0]['regularMarketChangePercent']}"),2)
                 if regularMarketChange < 0:
                     directionEmoji = "<:red_arrow_down:821559140345315348>"
