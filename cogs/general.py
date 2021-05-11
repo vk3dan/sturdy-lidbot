@@ -309,13 +309,18 @@ class general(commands.Cog, name="general"):
         Usage: !stonk <code> 
         Get some info about a stonk from its ticker code.
         """
-        cleanargs=re.sub(r'[^a-zA-Z0-9]','', args)
+        cleanargs=re.sub(r'[^a-zA-Z0-9.]','', args)
         url = "https://query1.finance.yahoo.com/v7/finance/quote?lang=en-US&region=US&corsDomain=finance.yahoo.com&symbols="+cleanargs
         # Async HTTP request
         async with aiohttp.ClientSession() as session:
             raw_response = await session.get(url)
             response = await raw_response.text()
             response = json.loads(response)
+            stonkname=""
+            try:
+                stonkname=response['quoteResponse']['result'][0]['displayName']
+            except:
+                stonkname=response['quoteResponse']['result'][0]['longName']
             try:
                 regularMarketPrice = round(float(f"{response['quoteResponse']['result'][0]['regularMarketPrice']}"),5)
                 regularMarketChange = round(float(f"{response['quoteResponse']['result'][0]['regularMarketChange']}"),5)
@@ -334,8 +339,8 @@ class general(commands.Cog, name="general"):
                 )
             else:
                 embed = discord.Embed(
-                    title=f":money_with_wings: Stonk: {response['quoteResponse']['result'][0]['displayName']} ({response['quoteResponse']['result'][0]['fullExchangeName']})",
-                    description=f"{response['quoteResponse']['result'][0]['symbol']} market price is: {regularMarketPrice} USD ( {directionEmoji} ${regularMarketChange} | {regularMarketChangePercent}% change )",
+                    title=f":money_with_wings: Stonk: {stonkname} ({response['quoteResponse']['result'][0]['fullExchangeName']})",
+                    description=f"{response['quoteResponse']['result'][0]['symbol']} market price is: {regularMarketPrice} {response['quoteResponse']['result'][0]['financialCurrency']} ( {directionEmoji} ${regularMarketChange} | {regularMarketChangePercent}% change )",
                     color=0x00FF00
                 )
             await context.send(embed=embed)
