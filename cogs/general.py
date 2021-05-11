@@ -317,6 +317,7 @@ class general(commands.Cog, name="general"):
             response = await raw_response.text()
             response = json.loads(response)
             stonkname=""
+            cursymbol = CurrencySymbols.get_symbol(response['quoteResponse']['result'][0]['financialCurrency'])
             try:
                 stonkname=response['quoteResponse']['result'][0]['displayName']
             except:
@@ -340,7 +341,7 @@ class general(commands.Cog, name="general"):
             else:
                 embed = discord.Embed(
                     title=f":money_with_wings: Stonk: {stonkname} ({response['quoteResponse']['result'][0]['fullExchangeName']})",
-                    description=f"{response['quoteResponse']['result'][0]['symbol']} market price is: {regularMarketPrice} {response['quoteResponse']['result'][0]['financialCurrency']} ( {directionEmoji} ${regularMarketChange} | {regularMarketChangePercent}% change )",
+                    description=f"{response['quoteResponse']['result'][0]['symbol']} market price is: {cursymbol}{regularMarketPrice} {response['quoteResponse']['result'][0]['financialCurrency']} ( {directionEmoji} {cursymbol}{regularMarketChange} | {regularMarketChangePercent}% change )",
                     color=0x00FF00
                 )
             await context.send(embed=embed)
