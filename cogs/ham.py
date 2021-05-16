@@ -198,24 +198,35 @@ class ham(commands.Cog, name="ham"):
             raw_response = await session.get(url)
             response = await raw_response.text()
             response = xmltodict.parse(response)
+        if redditor==1:
+            qrzlogo=file = discord.File("images/qrz+reddit.png", filename="qrz.png")
+        else:
+            qrzlogo=file = discord.File("images/qrz.png", filename="qrz.png")
         try:
             embed = discord.Embed(
                 title=f"QRZ lookup result:",
                 color=0x00FF00
             )
-            if redditor==1:
-                qrzlogo=file = discord.File("images/qrz+reddit.png", filename="qrz.png")
-            else:
-                qrzlogo=file = discord.File("images/qrz.png", filename="qrz.png")
-            embed.set_thumbnail(url=f"attachment://qrz.png")
             embed.add_field(
                 name="Callsign:",
                 value=f"[{response['QRZDatabase']['Callsign']['call']}](https://www.qrz.com/db/{response['QRZDatabase']['Callsign']['call']})",
                 inline=False
             )
+            try:
+                firstname=response['QRZDatabase']['Callsign']['fname']
+                lastname=response['QRZDatabase']['Callsign']['name']
+                name=f"{firstname} {lastname}"
+            except:
+                try:
+                    name=response['QRZDatabase']['Callsign']['name']
+                except:
+                    try:
+                        name=response['QRZDatabase']['Callsign']['fname']
+                    except:
+                        name=""
             embed.add_field(
                 name="Name:",
-                value=f"{response['QRZDatabase']['Callsign']['fname']} {response['QRZDatabase']['Callsign']['name']}",
+                value=f"{name}",
                 inline=False
             )
             if redditor==1 and redditname!="":
@@ -250,6 +261,7 @@ class ham(commands.Cog, name="ham"):
                 description=f"Callsign {cleanargs.upper()} not found",
                 color=0xFF0000
             )
+        embed.set_thumbnail(url=f"attachment://qrz.png")
         await context.send(file=qrzlogo, embed=embed)
 
     @commands.command(name="dxcc", aliases=["country"])
