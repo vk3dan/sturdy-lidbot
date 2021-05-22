@@ -24,8 +24,8 @@ class Help(commands.Cog, name="help"):
             command_list = [command.name for command in commands]
             command_description = [command.help for command in commands]
             help_text = '\n'.join(f'{prefix}{n} - {h}' for n, h in zip(command_list, command_description))
-            embed.add_field(name=i.capitalize(), value=f'```{help_text}```', inline=False)
-        await context.send(embed=embed)
+            embed = discord.Embed(title=f"Commands in {i.capitalize()} Cog", description=f'```{help_text}```', color=0x00FF00)
+            await context.send(embed=embed)
 
 def setup(bot):
     bot.add_cog(Help(bot))

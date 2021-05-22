@@ -526,10 +526,25 @@ class general(commands.Cog, name="general"):
             embed.add_field(name="Output", value=f"{outputcursymbol}{float(convertedamount):,.2f} {out_cur}", inline=True)
         await context.send(embed=embed)
 
-    @commands.command(name="missyelliot", aliases=["missy", "missify", "reverse"])
+
+
+    @commands.command(name="reverse", aliases=["backwards"])
+    async def reverseit(self, context, *, args):
+        """
+        Usage: !reverse <input text>
+        Reverse text.
+        """
+        reversed=args[::-1]
+        await context.send(reversed)
+
+    @commands.command(name="missyelliot", aliases=["missy", "missify", "upside down"])
     async def missyelliot(self, context, *, args):
-        cleanargs=re.sub(r'[^\x00-\x7F]+',' ', args)
-        missified= args[::-1]
+        """
+        Usage: !missyelliot <input text>
+        Put your thang down, flip it and reverse it.
+        """
+        cleanargs = re.sub(r'[^\x00-\x7F]+',' ', args)
+        missified = cleanargs[::-1]
         outputtext=""
         with open("resources/missify.json") as file:
             missyjson = json.load(file)
