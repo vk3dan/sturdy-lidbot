@@ -10,7 +10,7 @@ pictures and a couple of ham radio related commands.
 
 ## Commands
 
-#### General
+#### Commands in General Cog
 ```
 !info - Get some useful (or not) information about the bot.
 !serverinfo - Get some useful (or not) information about the server.
@@ -19,10 +19,9 @@ pictures and a couple of ham radio related commands.
 !poll - Create a poll where members can vote.
 !8ball - Ask any question to the bot.
 !btc - Usage: !bitcoin <currency> - Gets the current price of bitcoin.
-defaults to USD, can specify currency with ISO 4217 currency codes
-!doge - Usage: !doge <currency> - Gets the current price of dogecoin.
-defaults to USD, can specify currency with ISO 4217 currency codes.
-*TO THE MOON*.
+output defaults to USD.
+!doge - usage: !doge <currency> - Gets the current price of dogecoin.
+output defaults to USD *TO THE MOON*.
 !cat - Fetch a random cat pic from r/catpics on reddit.
 !stonk - Usage: !stonk <code> 
 Get some info about a stonk from its ticker code.
@@ -35,19 +34,23 @@ Give a question, some math, whatever; get answer back hopefully.
 !exchange - Usage: !exchange <value> <sourcecurrency> <outputcurrency>
 For example !exchange 56 AUD USD
 Converts an amount of currency to another.
+!reverse - Usage: !reverse <input text>
+Reverse text.
+!missyelliot - Usage: !missyelliot <input text>
+Put your thang down, flip it and reverse it.
 ```
-#### Help
+#### Commands in Help Cog
 ```
 !help - List all commands from every Cog the bot has loaded.
 ```
-#### Owner
+#### Commands in Owner Cog
 ```
 !shutdown - Make the bot shutdown
 !say - The bot will say anything you want.
 !embed - The bot will say anything you want, but within embeds.
 !blacklist - Lets you add or remove a user from not being able to use the bot.
 ```
-#### Ham
+#### Commands in Ham Cog
 ```
 !bands - Fetch an image about HF band conditions.
 !solar - Fetch an image about solar conditions.
