@@ -526,6 +526,11 @@ class general(commands.Cog, name="general"):
             embed.add_field(name="Output", value=f"{outputcursymbol}{float(convertedamount):,.2f} {out_cur}", inline=True)
         await context.send(embed=embed)
 
+    @commands.command(name="missyelliot", aliases=["missy", "missify", "reverse"])
+    async def missyelliot(self, context, *, args):
+        missified= args[::-1]
+        await context.send(missified)
+
     async def convertcurrency(self, amount, fromcurrency, tocurrency):
         currencyurl=f"https://v6.exchangerate-api.com/v6/{config.EXCHANGERATE_API_KEY}/latest/{fromcurrency}"
         async with aiohttp.ClientSession() as session:
