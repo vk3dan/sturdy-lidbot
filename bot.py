@@ -62,7 +62,7 @@ statuses = ['like a lid', 'with a baofeng', 'with myself', 'with my ding-ding',
 	'hard to get', 'basketball', 'football', 'stupid games', 'with SSTV', 'on Brandmeister',
 	'on TGIF', 'on 98003', 'Gonk Simulator', 'THE GAME. You just lost.', 'with velcro']
 
-penguins = {'kd1ldo':'There are always worse things, like penguin herpes.', 'W0CSG':'Did you sexually abuse penguins?', 'W0CSG':'PENGWINS.'}
+penguins = {'There are always worse things, like penguin herpes.':'kd1ldo', 'Did you sexually abuse penguins?':'W0CSG', 'PENGWINS.':'W0CSG'}
 
 gonksimeditions = [' ', '2', '3', '- Remastered', '2020: Gonkdemic', '2021', '2022',
 	'2047: Gonkout', 'for kids', 'with bacon', 'for linux'] 
@@ -129,7 +129,7 @@ async def on_message(message):
 				await webhook.delete()
 			elif "penguin" in message.content.lower():
 				webhook = await message.channel.create_webhook(name="lidstuff")
-				penguinnick, penguinquote = random.choice(list(penguins.items()))
+				penguinquote, penguinnick = random.choice(list(penguins.items()))
 				await webhook.send(penguinquote, username=penguinnick)
 				await webhook.delete()
 			await bot.process_commands(message)
