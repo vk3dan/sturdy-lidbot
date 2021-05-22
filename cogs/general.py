@@ -528,8 +528,17 @@ class general(commands.Cog, name="general"):
 
     @commands.command(name="missyelliot", aliases=["missy", "missify", "reverse"])
     async def missyelliot(self, context, *, args):
+        cleanargs=re.sub(r'[^\x00-\x7F]+',' ', args)
         missified= args[::-1]
-        await context.send(missified)
+        outputtext=""
+        with open("resources/missify.json") as file:
+            missyjson = json.load(file)
+        for char in missified:
+            try:
+                outputtext += missyjson[char]
+            except KeyError:
+                outputtext += ":shrug:"
+        await context.send(outputtext)
 
     async def convertcurrency(self, amount, fromcurrency, tocurrency):
         currencyurl=f"https://v6.exchangerate-api.com/v6/{config.EXCHANGERATE_API_KEY}/latest/{fromcurrency}"
