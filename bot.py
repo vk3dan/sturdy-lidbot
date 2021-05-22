@@ -13,9 +13,10 @@ This is a template to create your own discord bot in python.
 Version: 2.3
 """
 
-import discord, asyncio, os, platform, sys, random
+import discord, asyncio, os, platform, sys, random, requests
 from discord.ext.commands import Bot
 from discord.ext import commands
+from discord import Webhook, RequestsWebhookAdapter
 if not os.path.isfile("config.py"):
 	sys.exit("'config.py' not found! Please add it and try again.")
 else:
@@ -60,6 +61,8 @@ statuses = ['like a lid', 'with a baofeng', 'with myself', 'with my ding-ding',
 	'tag', 'ball', 'hardball', 'the fool', 'a doctor on tv', 'around', 'VHS tapes',
 	'hard to get', 'basketball', 'football', 'stupid games', 'with SSTV', 'on Brandmeister',
 	'on TGIF', 'on 98003', 'Gonk Simulator', 'THE GAME. You just lost.', 'with velcro']
+
+penguins = {'kd1ldo':'There are always worse things, like penguin herpes.', 'W0CSG':'Did you sexually abuse penguins?', 'W0CSG':'PENGWINS.'}
 
 gonksimeditions = [' ', '2', '3', '- Remastered', '2020: Gonkdemic', '2021', '2022',
 	'2047: Gonkout', 'for kids', 'with bacon', 'for linux'] 
@@ -120,6 +123,15 @@ async def on_message(message):
 				await message.add_reaction("🇴")
 				await message.add_reaction("🇳")
 				await message.add_reaction("🇰")
+			elif "south pole" in message.content.lower() and "penguin" in message.content.lower():
+				webhook = await message.channel.create_webhook(name="lidstuff")
+				await webhook.send("I thought we covered this, there are no goddamn penguins at the fucking south pole because there's a fucking desert, they're all on the coast.", username=config.PENGUIN_NAME)
+				await webhook.delete()
+			elif "penguin" in message.content.lower():
+				webhook = await message.channel.create_webhook(name="lidstuff")
+				penguinnick, penguinquote = random.choice(list(penguins.items()))
+				await webhook.send(penguinquote, username=penguinnick)
+				await webhook.delete()
 			await bot.process_commands(message)
 		else:
 			# Send a message to let the user know he's blacklisted
