@@ -567,7 +567,7 @@ class general(commands.Cog, name="general"):
             )
             embed.set_thumbnail(url=response['links']['patch']['small'])
             embed.add_field(name="Name:", value=f"[{response['name']}]({response['links']['wikipedia']})", inline=False)
-            embed.add_field(name="Launch time", value=launchtime, inline=True)
+            embed.add_field(name="Launch time:", value=launchtime, inline=True)
             embed.add_field(name="Launches in:", value=cd, inline=True)
             embed.add_field(name="Launches From:", value=f"{launchpadresponse['full_name']}, {launchpadresponse['region']}", inline=False)
         await context.send(embed=embed)
