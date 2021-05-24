@@ -1,8 +1,11 @@
 import os, sys, discord, platform, random, aiohttp, json, re, wolframalpha, requests
+from time import strftime
 from discord.ext import commands
 from currency_symbols import CurrencySymbols
 from geopy.geocoders import Nominatim
 from discord import Webhook, RequestsWebhookAdapter
+from datetime import datetime, time
+from dateutil import relativedelta, tz
 if not os.path.isfile("config.py"):
     sys.exit("'config.py' not found! Please add it and try again.")
 else:
@@ -534,16 +537,54 @@ class general(commands.Cog, name="general"):
             embed.add_field(name="Output", value=f"{outputcursymbol}{float(convertedamount):,.2f} {out_cur}", inline=True)
         await context.send(embed=embed)
 
+    @commands.command(name="spacex")
+    async def spacex(self, context):
+        url = "https://api.spacexdata.com/v4/launches/next"
+        async with aiohttp.ClientSession() as session:
+            raw_response = await session.get(url)
+            response = await raw_response.text()
+            response = json.loads(response)
+            launchpadurl = f"https://api.spacexdata.com/v4/launchpads/{response['launchpad']}"
+            raw_response = await session.get(launchpadurl)
+            launchpadresponse = await raw_response.text()
+            launchpadresponse = json.loads(launchpadresponse)
+            launchtime = response['date_unix']
+            launchtime = datetime.fromtimestamp(launchtime, tz.UTC)
+            now = datetime.now(tz=tz.tzutc())
+            countdown = relativedelta.relativedelta(launchtime, now)
+            launchtime = launchtime.strftime("%Y-%m-%d %H:%M:%S UTC")
+            cd = "L- "
+            if countdown.days > 0:
+                cd += f"{countdown.days} days, "
+            if countdown.hours > 0:
+                cd += f"{countdown.hours} hours, "
+            if countdown.minutes > 0:
+                cd += f"{countdown.minutes} mins, "
+            cd += f"{countdown.seconds} secs"
+            embed = discord.Embed(
+                title="Next SpaceX launch:",
+                color=0x00FF00
+            )
+            embed.set_thumbnail(url=response['links']['patch']['small'])
+            embed.add_field(name="Name:", value=f"[{response['name']}]({response['links']['wikipedia']})", inline=False)
+            embed.add_field(name="Launch time", value=launchtime, inline=True)
+            embed.add_field(name="Launches in:", value=cd, inline=True)
+            embed.add_field(name="Launches From:", value=f"{launchpadresponse['full_name']}, {launchpadresponse['region']}", inline=False)
+        await context.send(embed=embed)
+        await context.message.delete()
 
 
-    @commands.command(name="reverse", aliases=["backwards"])
+    @commands.command(name="reverse", aliases=["backwards", "reverseit"])
     async def reverseit(self, context, *, args):
         """
         Usage: !reverse <input text>
         Reverse text.
         """
         reversed=args[::-1]
-        await context.send(reversed)
+        webhook = await context.channel.create_webhook(name="lidstuff")
+        await webhook.send(reversed, username=context.message.author.display_name, avatar_url=context.message.author.avatar_url)
+        await webhook.delete()
+        await context.message.delete()
 
     @commands.command(name="missyelliot", aliases=["missy", "missify", "upside down"])
     async def missyelliot(self, context, *, args):
@@ -587,7 +628,6 @@ class general(commands.Cog, name="general"):
         directions = ["N", "NNE", "NE", "ENE", "E", "ESE", "SE", "SSE", "S", "SSW", "SW", "WSW", "W", "WNW", "NW", "NNW", "N"]
         compass_direction = round(degrees / 22.5)
         return directions[compass_direction]
-
 
 def setup(bot):
     bot.add_cog(general(bot))
