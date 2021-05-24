@@ -1,7 +1,8 @@
-import os, sys, discord, platform, random, aiohttp, json, re, wolframalpha
+import os, sys, discord, platform, random, aiohttp, json, re, wolframalpha, requests
 from discord.ext import commands
 from currency_symbols import CurrencySymbols
 from geopy.geocoders import Nominatim
+from discord import Webhook, RequestsWebhookAdapter
 if not os.path.isfile("config.py"):
     sys.exit("'config.py' not found! Please add it and try again.")
 else:
@@ -301,7 +302,10 @@ class general(commands.Cog, name="general"):
                 embed.set_image(url=f"https://i.redd.it/{response[0]['data']['children'][0]['data']['gallery_data']['items'][0]['media_id']}.jpg")
             except:
                 embed.set_image(url=response[0]['data']['children'][0]['data']['url'])
-            await context.send(embed=embed)
+        webhook = await context.channel.create_webhook(name="lidstuff")
+        await webhook.send(embed=embed, username=context.message.author.display_name, avatar_url=context.message.author.avatar_url)
+        await webhook.delete()
+        await context.message.delete()
 
     @commands.command(name="stonk", aliases=["stock"])
     async def stonk(self, context, *, args):
@@ -381,7 +385,10 @@ class general(commands.Cog, name="general"):
                 color=0x00FF00
             )
             embed.set_image(url=response['hdurl'])
-            await context.send(embed=embed)
+            webhook = await context.channel.create_webhook(name="lidstuff")
+            await webhook.send(embed=embed, username=context.message.author.display_name, avatar_url=context.message.author.avatar_url)
+            await webhook.delete()
+            await context.message.delete()
 
     @commands.command(name="wx", aliases=["weather"])
     async def wx(self, context, *, args):
@@ -553,7 +560,10 @@ class general(commands.Cog, name="general"):
                 outputtext += missyjson[char]
             except KeyError:
                 outputtext += ":shrug:"
-        await context.send(outputtext)
+        webhook = await context.channel.create_webhook(name="lidstuff")
+        await webhook.send(outputtext, username=context.message.author.display_name, avatar_url=context.message.author.avatar_url)
+        await webhook.delete()
+        await context.message.delete()
 
     async def convertcurrency(self, amount, fromcurrency, tocurrency):
         currencyurl=f"https://v6.exchangerate-api.com/v6/{config.EXCHANGERATE_API_KEY}/latest/{fromcurrency}"
