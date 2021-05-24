@@ -146,8 +146,9 @@ class general(commands.Cog, name="general"):
             color=0x00FF00
         )
         embed.set_footer(
-            text=f"Poll created by: {context.message.author} • React to vote!"
+            text=f"Poll created by: {context.message.author.display_name} • React to vote!"
         )
+        await context.message.delete()
         embed_message = await context.send(embed=embed)
         await embed_message.add_reaction("👍")
         await embed_message.add_reaction("👎")
