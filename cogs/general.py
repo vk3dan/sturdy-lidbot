@@ -303,8 +303,8 @@ class general(commands.Cog, name="general"):
                 color=0x00FF00
             )
             embed.add_field(
-                name=f"{response[0]['data']['children'][0]['data']['title']}",
-                value=f"[View on Reddit](https://reddit.com/{response[0]['data']['children'][0]['data']['permalink']} 'View post on r/catpics')",
+                name=f"{response[0]['data']['children'][0]['data']['title']} *by u/{response[0]['data']['children'][0]['data']['author']}*",
+                value=f"[View on Reddit](https://reddit.com{response[0]['data']['children'][0]['data']['permalink']} 'View post on r/catpics')",
                 inline=False
             )
             try:
