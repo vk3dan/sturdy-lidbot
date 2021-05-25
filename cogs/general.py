@@ -299,8 +299,13 @@ class general(commands.Cog, name="general"):
             response = await raw_response.text()
             response = json.loads(response)
             embed = discord.Embed(
-                title=f":cat: {response[0]['data']['children'][0]['data']['title']}",
+                title=f":cat: Have a cat!",
                 color=0x00FF00
+            )
+            embed.add_field(
+                name=f"{response[0]['data']['children'][0]['data']['title']}",
+                value=f"[View on Reddit](https://reddit.com/{response[0]['data']['children'][0]['data']['permalink']} 'View post on r/catpics')",
+                inline=False
             )
             try:
                 embed.set_image(url=f"https://i.redd.it/{response[0]['data']['children'][0]['data']['gallery_data']['items'][0]['media_id']}.jpg")
@@ -586,22 +591,26 @@ class general(commands.Cog, name="general"):
         await webhook.delete()
         await context.message.delete()
 
-    @commands.command(name="missyelliot", aliases=["missy", "missify", "upside down"])
+    @commands.command(name="missyelliot", aliases=["missy", "missify", "upsidedown"])
     async def missyelliot(self, context, *, args):
         """
         Usage: !missyelliot <input text>
         Put your thang down, flip it and reverse it.
         """
         cleanargs = re.sub(r'[^\x00-\x7F]+',' ', args)
-        missified = cleanargs[::-1]
+        missify = cleanargs[::-1]
         outputtext=""
+        nosjyssim = {}
         with open("resources/missify.json") as file:
             missyjson = json.load(file)
-        for char in missified:
+        for key, value in missyjson.items():
+            nosjyssim[value] = key
+        missyjson = {**missyjson, **nosjyssim}
+        for char in missify:
             try:
                 outputtext += missyjson[char]
             except KeyError:
-                outputtext += ":shrug:"
+                outputtext += " "
         webhook = await context.channel.create_webhook(name="lidstuff")
         await webhook.send(outputtext, username=context.message.author.display_name, avatar_url=context.message.author.avatar_url)
         await webhook.delete()
