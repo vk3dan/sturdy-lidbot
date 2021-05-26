@@ -1,4 +1,4 @@
-import os, sys, discord, platform, random, aiohttp, json, re, wolframalpha, requests
+import os, sys, discord, platform, random, aiohttp, json, re, wolframalpha, subprocess
 from time import strftime
 from discord.ext import commands
 from currency_symbols import CurrencySymbols
@@ -616,9 +616,13 @@ class general(commands.Cog, name="general"):
                 missifiedname += missyjson[char]
             except KeyError:
                 missifiedname += " "
+        filename="avatar.webp"
+        await context.message.author.avatar_url.save(filename)
+        avatarrotated=subprocess.check_output(f"/usr/bin/convert {filename} -rotate 180 png:-",shell=True)
         missifiedname = missifiedname[::-1]
         webhook = await context.channel.create_webhook(name="lidstuff")
-        await webhook.send(missifiedname, username=outputtext, avatar_url=context.message.author.avatar_url)
+        await webhook.edit(avatar=avatarrotated)
+        await webhook.send(missifiedname, username=outputtext)
         await webhook.delete()
         await context.message.delete()
 
