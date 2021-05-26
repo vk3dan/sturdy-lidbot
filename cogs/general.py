@@ -597,9 +597,9 @@ class general(commands.Cog, name="general"):
         Usage: !missyelliot <input text>
         Put your thang down, flip it and reverse it.
         """
-        cleanargs = re.sub(r'[^\x00-\x7F]+',' ', args)
-        missify = cleanargs[::-1]
+        missify = args[::-1]
         outputtext=""
+        missifiedname=""
         nosjyssim = {}
         with open("resources/missify.json") as file:
             missyjson = json.load(file)
@@ -611,8 +611,14 @@ class general(commands.Cog, name="general"):
                 outputtext += missyjson[char]
             except KeyError:
                 outputtext += " "
+        for char in context.message.author.display_name:
+            try:
+                missifiedname += missyjson[char]
+            except KeyError:
+                missifiedname += " "
+        missifiedname = missifiedname[::-1]
         webhook = await context.channel.create_webhook(name="lidstuff")
-        await webhook.send(outputtext, username=context.message.author.display_name, avatar_url=context.message.author.avatar_url)
+        await webhook.send(missifiedname, username=outputtext, avatar_url=context.message.author.avatar_url)
         await webhook.delete()
         await context.message.delete()
 

@@ -127,7 +127,7 @@ async def on_message(message):
 				webhook = await message.channel.create_webhook(name="lidstuff")
 				await webhook.send("I thought we covered this, there are no goddamn penguins at the fucking south pole because there's a fucking desert, they're all on the coast.", username=config.PENGUIN_NAME)
 				await webhook.delete()
-			elif "penguin" in message.content.lower():
+			elif "penguin" in message.content.lower() or "🐧" in message.content:
 				webhook = await message.channel.create_webhook(name="lidstuff")
 				penguinquote, penguinnick = random.choice(list(penguins.items()))
 				await webhook.send(penguinquote, username=penguinnick)
