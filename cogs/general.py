@@ -172,9 +172,6 @@ class general(commands.Cog, name="general"):
             description=f"{random.choice(answers)}",
             color=0x00FF00
         )
-        embed.set_footer(
-            text=f"Question asked by: {context.message.author}"
-        )
         await context.send(embed=embed)
 
     @commands.command(name="btc", aliases=["bitcoin"])
@@ -216,7 +213,10 @@ class general(commands.Cog, name="general"):
                 inline=False
             )
             embed.set_thumbnail(url="https://upload.wikimedia.org/wikipedia/commons/thumb/4/46/Bitcoin.svg/256px-Bitcoin.svg.png")
-            await context.send(embed=embed)
+            webhook = await context.channel.create_webhook(name="lidstuff")
+            await webhook.send(embed=embed, username=context.message.author.display_name, avatar_url=context.message.author.avatar_url)
+            await webhook.delete()
+            await context.message.delete()
 
     @commands.command(name="doge", aliases=["dogecoin"])
     async def dogecoin(self, context,*,args=""):
@@ -285,7 +285,10 @@ class general(commands.Cog, name="general"):
                     inline=False
                 )
             embed.set_thumbnail(url="https://cdn.discordapp.com/emojis/829928818508431400.png")
-            await context.send(embed=embed)
+            webhook = await context.channel.create_webhook(name="lidstuff")
+            await webhook.send(embed=embed, username=context.message.author.display_name, avatar_url=context.message.author.avatar_url)
+            await webhook.delete()
+            await context.message.delete()
 
     @commands.command(name="cat", aliases=["kitty","neko"])
     async def kitty(self, context):
@@ -357,7 +360,10 @@ class general(commands.Cog, name="general"):
                     description=f"{response['quoteResponse']['result'][0]['symbol']} market price is: {cursymbol}{regularMarketPrice} {response['quoteResponse']['result'][0]['financialCurrency']} ( {directionEmoji} {cursymbol}{regularMarketChange} | {regularMarketChangePercent}% change )",
                     color=0x00FF00
                 )
-            await context.send(embed=embed)
+            webhook = await context.channel.create_webhook(name="lidstuff")
+            await webhook.send(embed=embed, username=context.message.author.display_name, avatar_url=context.message.author.avatar_url)
+            await webhook.delete()
+            await context.message.delete()
 
     @commands.command(name="gonk")
     async def gonk(self, context):
@@ -470,7 +476,10 @@ class general(commands.Cog, name="general"):
                     embed.add_field(name=f"**ALERT: {response['alerts']['event']}** from {response['alerts']['sender_name']}", value=f"{response['alerts']['description']}", inline=False)
                 except:
                     pass
-            await context.send(embed=embed)
+            webhook = await context.channel.create_webhook(name="lidstuff")
+            await webhook.send(embed=embed, username=context.message.author.display_name, avatar_url=context.message.author.avatar_url)
+            await webhook.delete()
+            await context.message.delete()
 
     @commands.command(name="ask", aliases=["wolfram"])
     async def askwolfram(self, context, *, args):
@@ -533,6 +542,8 @@ class general(commands.Cog, name="general"):
                 description="Currency error: check that you are using correct\nISO 4217 currency code",
                 color=0xFF0000
             )
+            await context.send(embed=embed)
+            return
         else:
             embed = discord.Embed(
                 title=":coin: Exchange:",
@@ -540,7 +551,10 @@ class general(commands.Cog, name="general"):
             )
             embed.add_field(name="Input", value=f"{inputcursymbol}{float(cleaninputamount):,.2f} {in_cur}", inline=True)
             embed.add_field(name="Output", value=f"{outputcursymbol}{float(convertedamount):,.2f} {out_cur}", inline=True)
-        await context.send(embed=embed)
+            webhook = await context.channel.create_webhook(name="lidstuff")
+            await webhook.send(embed=embed, username=context.message.author.display_name, avatar_url=context.message.author.avatar_url)
+            await webhook.delete()
+            await context.message.delete()
 
     @commands.command(name="spacex")
     async def spacex(self, context):
@@ -586,8 +600,9 @@ class general(commands.Cog, name="general"):
         Reverse text.
         """
         reversed=args[::-1]
+        reverseduname=context.message.author.display_name[::-1]
         webhook = await context.channel.create_webhook(name="lidstuff")
-        await webhook.send(reversed, username=context.message.author.display_name, avatar_url=context.message.author.avatar_url)
+        await webhook.send(reversed, username=reverseduname, avatar_url=context.message.author.avatar_url)
         await webhook.delete()
         await context.message.delete()
 

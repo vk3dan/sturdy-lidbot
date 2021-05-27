@@ -25,10 +25,10 @@ class ham(commands.Cog, name="ham"):
             inline=True
         )
         embed.set_image(url="http://www.hamqsl.com/solarbc.php")
-        embed.set_footer(
-            text=f"Request by {context.message.author}"
-        )
-        await context.send(embed=embed)
+        webhook = await context.channel.create_webhook(name="lidstuff")
+        await webhook.send(embed=embed, username=context.message.author.display_name, avatar_url=context.message.author.avatar_url)
+        await webhook.delete()
+        await context.message.delete()
 
     @commands.command(name="solar")
     async def solar(self, context):
@@ -44,23 +44,26 @@ class ham(commands.Cog, name="ham"):
             inline=True
         )
         embed.set_image(url="https://www.hamqsl.com/solarn0nbh.php?image=sdo_131")
-        await context.send(embed=embed)
+        webhook = await context.channel.create_webhook(name="lidstuff")
+        await webhook.send(embed=embed, username=context.message.author.display_name, avatar_url=context.message.author.avatar_url)
+        await webhook.delete()
+        await context.message.delete()
 
     @commands.command(name="dmr", aliases=["dmrid"])
     async def dmr(self, context, *, args):
         """
         Usage: !dmr <callsign/dmrid> - Get DMR ID from callsign, or vice-versa
         """
-        cleanargs=re.sub(r'[^a-zA-Z0-9]','', args)
+        callsign=re.sub(r'[^a-zA-Z0-9]','', args)
         try:
-            int(cleanargs)
+            int(callsign)
             requesttype="id"
-            print(f"numeric input, search id {cleanargs}")
+            print(f"numeric input, search id {callsign}")
         except:
             requesttype="callsign"
-            print(f"alphanumeric input, search callsign {cleanargs}")
+            print(f"alphanumeric input, search callsign {callsign}")
         
-        url = f"https://www.radioid.net/api/dmr/user/?{requesttype}={cleanargs}"
+        url = f"https://www.radioid.net/api/dmr/user/?{requesttype}={callsign}"
         print(url)
         # Async HTTP request
         async with aiohttp.ClientSession() as session:
@@ -71,7 +74,7 @@ class ham(commands.Cog, name="ham"):
             except:
                 embed=discord.Embed(
                     title=f":warning: DMR ID error:",
-                    description=f"{requesttype} {cleanargs} not found",
+                    description=f"{requesttype} {callsign} not found",
                     color=0xFF0000
                 )
             else:
@@ -87,6 +90,7 @@ class ham(commands.Cog, name="ham"):
                     color=0x00FF00
                 )
                 embed.set_thumbnail(url="https://cdn.discordapp.com/emojis/829926368824918046.png")
+                callsign = response['results'][0]['callsign']
                 embed.add_field(
                     name="Callsign:",
                     value=response['results'][0]['callsign'],
@@ -112,7 +116,10 @@ class ham(commands.Cog, name="ham"):
                     value=response['results'][0]['country'],
                     inline=True
                 )
-            await context.send(embed=embed)
+        webhook = await context.channel.create_webhook(name="lidstuff")
+        await webhook.send(embed=embed, username=f"{callsign} (for {context.message.author.display_name})", avatar_url=context.message.author.avatar_url)
+        await webhook.delete()
+        await context.message.delete()
 
     @commands.command(name="morse", aliases=["cw"])
     async def morse(self, context, *, args):
@@ -129,7 +136,10 @@ class ham(commands.Cog, name="ham"):
             except KeyError:
                 outputtext += ":shrug:"
             outputtext += " "
-        await context.send(outputtext)
+        webhook = await context.channel.create_webhook(name="lidstuff")
+        await webhook.send(outputtext, username=context.message.author.display_name, avatar_url=context.message.author.avatar_url)
+        await webhook.delete()
+        await context.message.delete()
 
     @commands.command(name="demorse", aliases=["unmorse","uncw"])
     async def demorse(self, context, *, args):
@@ -153,7 +163,10 @@ class ham(commands.Cog, name="ham"):
                 except KeyError:
                     outputtext += ":shrug:"
             outputtext += " "
-        await context.send(outputtext)
+        webhook = await context.channel.create_webhook(name="lidstuff")
+        await webhook.send(outputtext, username=context.message.author.display_name, avatar_url=context.message.author.avatar_url)
+        await webhook.delete()
+        await context.message.delete()
 
     @commands.command(name="qrz", aliases=["call","lookup","dox"])
     async def qrz(self, context, *, args):
@@ -163,6 +176,7 @@ class ham(commands.Cog, name="ham"):
         cleanargs=re.sub(r'[^a-zA-Z0-9]','', args)
         redditurl = "https://raw.githubusercontent.com/molo1134/qrmbot/master/lib/nicks.csv"
         redditfile = "resources/nicks.csv"
+        callsign=cleanargs.upper()
         current_time = time.time()
         if os.path.isfile(redditfile):
             print("nicks.csv found")
@@ -212,6 +226,7 @@ class ham(commands.Cog, name="ham"):
                 value=f"[{response['QRZDatabase']['Callsign']['call']}](https://www.qrz.com/db/{response['QRZDatabase']['Callsign']['call']})",
                 inline=False
             )
+            callsign=response['QRZDatabase']['Callsign']['call']
             try:
                 firstname=response['QRZDatabase']['Callsign']['fname']
                 lastname=response['QRZDatabase']['Callsign']['name']
@@ -262,7 +277,10 @@ class ham(commands.Cog, name="ham"):
                 color=0xFF0000
             )
         embed.set_thumbnail(url=f"attachment://qrz.png")
-        await context.send(file=qrzlogo, embed=embed)
+        webhook = await context.channel.create_webhook(name="lidstuff")
+        await webhook.send(file=qrzlogo, embed=embed, username=f"{callsign} (for {context.message.author.display_name})", avatar_url=context.message.author.avatar_url)
+        await webhook.delete()
+        await context.message.delete()
 
     @commands.command(name="dxcc", aliases=["country"])
     async def dxcc(self, context, *, args):
@@ -282,9 +300,10 @@ class ham(commands.Cog, name="ham"):
             raw_response = await session.get(url)
             response = await raw_response.text()
             response = xmltodict.parse(response)
+        dxcc=cleanargs.upper()
         try:
             embed = discord.Embed(
-                title=f"DXCC for {cleanargs.upper()}:",
+                title=f"DXCC for {dxcc}:",
                 color=0x00FF00
             )
             embed.add_field(
@@ -292,6 +311,7 @@ class ham(commands.Cog, name="ham"):
                 value=response['QRZDatabase']['DXCC']['dxcc'],
                 inline=True
             )
+            dxcc=response['QRZDatabase']['DXCC']['name']
             embed.add_field(
                 name="Name:",
                 value=response['QRZDatabase']['DXCC']['name'],
@@ -333,7 +353,10 @@ class ham(commands.Cog, name="ham"):
                 description=f"DXCC {cleanargs.upper()} not found",
                 color=0xFF0000
             )
-        await context.send(embed=embed)
+        webhook = await context.channel.create_webhook(name="lidstuff")
+        await webhook.send(embed=embed, username=f"{dxcc} (for {context.message.author.display_name})", avatar_url=context.message.author.avatar_url)
+        await webhook.delete()
+        await context.message.delete()
 
 
 def setup(bot):
