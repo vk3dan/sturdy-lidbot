@@ -671,7 +671,8 @@ class general(commands.Cog, name="general"):
                 )
                 await context.send(embed=embed)
                 return 1
-            name=msg.author.display_name
+            member=msg.guild.get_member(msg.author.id)
+            name=member.nick
             quote=msg.content
         else:
             name=args[0]
