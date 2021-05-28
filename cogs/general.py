@@ -1,4 +1,4 @@
-import os, sys, discord, platform, random, aiohttp, json, re, wolframalpha, subprocess
+import os, sys, discord, platform, random, aiohttp, json, re, wolframalpha, subprocess, discord.ext
 from time import strftime
 from discord.ext import commands
 from currency_symbols import CurrencySymbols
@@ -558,6 +558,9 @@ class general(commands.Cog, name="general"):
 
     @commands.command(name="spacex")
     async def spacex(self, context):
+        """
+            Get info on next SpaceX launch.
+        """
         url = "https://api.spacexdata.com/v4/launches/next"
         async with aiohttp.ClientSession() as session:
             raw_response = await session.get(url)
@@ -640,6 +643,112 @@ class general(commands.Cog, name="general"):
         await webhook.send(missifiedname, username=outputtext)
         await webhook.delete()
         await context.message.delete()
+
+    @commands.command(name="addquote")
+    async def addquote(self, context, *args):
+        """
+        Add a quote (server specific)
+        Usage: !addquote <MessageID>
+           Or: !addquote <DisplayName> <quote>
+        """
+        if len(args)==0:
+            embed = discord.Embed(
+                title=":warning: Error",
+                description="Error adding quote: no quote specified.\nUsage: !addquote <MessageID>\n   Or: !addquote <DisplayName> <quote>",
+                color=0xFF0000
+            )
+            await context.send(embed=embed)
+            return 1
+        elif args[0].isdecimal():
+            msgID=args[0]
+            try:
+                msg = await context.message.channel.fetch_message(msgID)
+            except:
+                embed = discord.Embed(
+                    title=":warning: Error",
+                    description=f"Error adding quote: Message {msgID} not found",
+                    color=0xFF0000
+                )
+                await context.send(embed=embed)
+                return 1
+            name=msg.author.display_name
+            quote=msg.content
+        else:
+            name=args[0]
+            name=name.replace('>','')
+            name=name.replace('<','')
+            quote=' '.join(args[1:])
+        quotefile=f"resources/{context.message.guild.id}quotes.json"
+        justincaseempty=open(quotefile,"a")
+        justincaseempty.close
+        with open(quotefile,"r") as quotejson:
+            try:
+                data = json.loads(quotejson.read())
+                print(data)
+            except:
+                data={}
+            quotes={}
+            print(data)
+            quotenum=len(data)+1
+            quotes[int(quotenum)]={
+                'name':name,
+                'quote':quote
+            }
+        data.update(quotes)
+        data=json.dumps(data)
+        with open(quotefile,"w") as quotejson:
+            quotejson.write(data)
+        embed = discord.Embed(
+            title="Quote added",
+            description=f"Added quote \"{name}: {quote}\" to quotes",
+            color=0x00FF00
+        )
+        webhook = await context.channel.create_webhook(name="lidstuff")
+        await webhook.send(embed=embed, username=context.message.author.display_name, avatar_url=context.message.author.avatar_url)
+        await webhook.delete()
+        await context.message.delete()
+
+    @commands.command(name="quote")
+    async def quote(self, context, *, args=""):
+        """
+        Display a quote (server specific)
+        Usage: !quote
+           Or: !quote <quotenumber>
+        """
+        quotefile=f"resources/{context.message.guild.id}quotes.json"
+        if os.path.isfile(quotefile):
+            print(f"{quotefile} found")
+        else:
+            embed = discord.Embed(
+                title=":warning: Error",
+                description="Quote data does not exist for this server, try adding a quote with !addquote first",
+                color=0xFF0000
+            )
+            await context.send(embed=embed)
+            return 1
+        with open(quotefile) as quotejson:
+            quotes = json.loads(quotejson.read())
+            quotemax=len(quotes)
+            if args.isdecimal():
+                if int(args)>quotemax:
+                    embed = discord.Embed(
+                        title=":warning: Error",
+                        description=f"Quote number {args} does not exist yet.",
+                        color=0xFF0000
+                    )
+                    await context.send(embed=embed)
+                    return 1
+                else:
+                    quotenum=int(args)
+            else:
+                quotenum=random.randint(1, quotemax)
+            print(f"Displaying quote {quotenum}:")
+            name=quotes[f"{quotenum}"]['name']
+            quote=quotes[f"{quotenum}"]['quote']
+            webhook = await context.channel.create_webhook(name="lidstuff")
+            await webhook.send(quote, username=f"{name} ({quotenum})", avatar_url="http://2.bp.blogspot.com/-xJg2euabxZo/UjDaFUUJmUI/AAAAAAAAAM0/y0ILnK5A0bg/s1600/quotes.png")
+            await webhook.delete()
+            await context.message.delete()
 
     async def convertcurrency(self, amount, fromcurrency, tocurrency):
         currencyurl=f"https://v6.exchangerate-api.com/v6/{config.EXCHANGERATE_API_KEY}/latest/{fromcurrency}"
