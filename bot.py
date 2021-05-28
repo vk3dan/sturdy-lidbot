@@ -53,6 +53,7 @@ intents.members = True
 """
 
 intents = discord.Intents.default()
+intents.members = True
 
 bot = Bot(command_prefix=config.BOT_PREFIX, intents=intents, case_insensitive=True)
 
