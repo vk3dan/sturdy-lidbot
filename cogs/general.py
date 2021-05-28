@@ -673,6 +673,8 @@ class general(commands.Cog, name="general"):
                 return 1
             member=msg.guild.get_member(msg.author.id)
             name=member.nick
+            if name==None or name=="" or name=="None":
+                name=msg.author.display_name
             quote=msg.content
         else:
             name=args[0]
