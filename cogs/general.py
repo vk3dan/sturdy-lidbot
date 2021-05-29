@@ -579,7 +579,7 @@ class general(commands.Cog, name="general"):
             if countdown.days > 0:
                 cd += f"{countdown.days} days, "
             if countdown.hours > 0:
-                cd += f"{countdown.hours} hours, "
+                cd += f"{countdown.hours} hours, \n"
             if countdown.minutes > 0:
                 cd += f"{countdown.minutes} mins, "
             cd += f"{countdown.seconds} secs"
@@ -597,6 +597,7 @@ class general(commands.Cog, name="general"):
             embed.add_field(name="Launch time:", value=launchtime, inline=True)
             embed.add_field(name="Launches in:", value=cd, inline=True)
             embed.add_field(name="Launches From:", value=f"{launchpadresponse['full_name']}, {launchpadresponse['region']}", inline=False)
+            embed.add_field(name="Details:", value=response['details'])
             webhook = await context.channel.create_webhook(name="lidstuff")
             await webhook.send(embed=embed, username=context.message.author.display_name, avatar_url=context.message.author.avatar_url)
             await webhook.delete()
