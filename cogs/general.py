@@ -678,12 +678,10 @@ class general(commands.Cog, name="general"):
             quote=msg.content
         elif str(args[0]).startswith("<"):
             inputstring=' '.join(args)
-            name=re.search('<(.*?)>', inputstring).group()
-            start, sep, quote=inputstring.partition('> ')
+            name, sep, quote=inputstring.partition('> ')
+            name = name[1:]
         else:
             name=args[0]
-            name=name.replace('>','')
-            name=name.replace('<','')
             quote=' '.join(args[1:])
         quotefile=f"resources/{context.message.guild.id}quotes.json"
         justincaseempty=open(quotefile,"a")
@@ -691,11 +689,9 @@ class general(commands.Cog, name="general"):
         with open(quotefile,"r") as quotejson:
             try:
                 data = json.loads(quotejson.read())
-                print(data)
             except:
                 data={}
             quotes={}
-            print(data)
             quotenum=len(data)+1
             quotes[int(quotenum)]={
                 'name':name,
@@ -728,7 +724,7 @@ class general(commands.Cog, name="general"):
         else:
             embed = discord.Embed(
                 title=":warning: Error",
-                description="Quote data does not exist for this server, try adding a quote with !addquote first",
+                description=f"Quote data does not exist for {context.message.guild},\ntry adding a quote with !addquote first",
                 color=0xFF0000
             )
             await context.send(embed=embed)
@@ -756,6 +752,51 @@ class general(commands.Cog, name="general"):
             await webhook.send(quote, username=f"{name} ({quotenum})", avatar_url="http://2.bp.blogspot.com/-xJg2euabxZo/UjDaFUUJmUI/AAAAAAAAAM0/y0ILnK5A0bg/s1600/quotes.png")
             await webhook.delete()
             await context.message.delete()
+
+    @commands.command(name="quotesearch", aliases=["searchquote", "findquote"])
+    async def quotesearch(self, context, *, args=""):
+        """
+        Find a quote (server specific). Returns quotes via DM
+        Usage: !quotesearch <keyword>
+        """
+        quotefile=f"resources/{context.message.guild.id}quotes.json"
+        if os.path.isfile(quotefile):
+            print(f"{quotefile} found")
+        else:
+            embed = discord.Embed(
+                title=":warning: Error",
+                description=f"Quote data does not exist for {context.message.guild},\ntry adding a quote with !addquote first",
+                color=0xFF0000
+            )
+            await context.send(embed=embed)
+            return 1
+        if args=="":
+            embed = discord.Embed(
+                title=":warning: Error",
+                description="Input error. Usage !quotesearch <keyword>",
+                color=0xFF0000
+            )
+            await context.send(embed=embed)
+            return 1
+        keyword=args
+        matchlist=""
+        with open(quotefile) as quotejson:
+            quotes = json.loads(quotejson.read())
+            quotemax=len(quotes)+1
+            for i in range(1,quotemax):
+                name=quotes[f"{i}"]['name']
+                quote=quotes[f"{i}"]['quote']
+                if keyword.lower() in name.lower() or keyword.lower() in quote.lower():
+                    if matchlist=="":
+                        matchlist+=f"Quotes found for server ***{context.message.guild}***:\n"
+                    matchlist+=f"Quote {i}: {name}: {quote}\n"
+        if matchlist=="":
+            matchlist+=f"No quotes found matching {keyword.lower()}"
+        user=context.message.author
+        await user.send(matchlist)
+        await context.send(f"DM sent to {user.mention}")
+        await context.message.delete()
+
 
     async def convertcurrency(self, amount, fromcurrency, tocurrency):
         currencyurl=f"https://v6.exchangerate-api.com/v6/{config.EXCHANGERATE_API_KEY}/latest/{fromcurrency}"
