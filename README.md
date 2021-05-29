@@ -6,7 +6,7 @@ was adapted from **[Krypton (@kkrypt0nn)](https://github.com/kkrypt0nn)**'s
 bot template.
 
 It has had some features added sofar such as dogecoin price, random cat
-pictures and a couple of ham radio related commands.
+pictures, flipping text, a quote system and a couple of ham radio related commands.
 
 ## Commands
 
@@ -34,10 +34,19 @@ Give a question, some math, whatever; get answer back hopefully.
 !exchange - Usage: !exchange <value> <sourcecurrency> <outputcurrency>
 For example !exchange 56 AUD USD
 Converts an amount of currency to another.
+!spacex - Get info on next SpaceX launch.
 !reverse - Usage: !reverse <input text>
 Reverse text.
 !missyelliot - Usage: !missyelliot <input text>
 Put your thang down, flip it and reverse it.
+!addquote - Add a quote (server specific)
+Usage: !addquote MessageID
+   Or: !addquote <DisplayName> quotetext (Display Name must be inside '<' and '>' if there are spaces in the name otherwise optional)
+!quote - Display a quote (server specific)
+Usage: !quote
+   Or: !quote <quotenumber>
+!quotesearch - Find a quote (server specific). Returns quotes via DM
+Usage: !quotesearch <keyword>
 ```
 #### Commands in Help Cog
 ```
