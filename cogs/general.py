@@ -587,13 +587,20 @@ class general(commands.Cog, name="general"):
                 title="Next SpaceX launch:",
                 color=0x00FF00
             )
-            embed.set_thumbnail(url=response['links']['patch']['small'])
-            embed.add_field(name="Name:", value=f"[{response['name']}]({response['links']['wikipedia']})", inline=False)
+            embed.add_field(name="Name:", value=f"{response['name']}", inline=False)
+            if not str(response['links']['patch']['small']).startswith("https"):
+                embed.set_thumbnail(url="https://cdn.iconscout.com/icon/free/png-256/spacex-282142.png")
+            else:
+                embed.set_thumbnail(url=response['links']['patch']['small'])
+            if str(response['links']['wikipedia']).startswith("https"):
+                embed.add_field(name="Wikipedia:", value=f"[{response['name']} page]({response['links']['wikipedia']})", inline=False)
             embed.add_field(name="Launch time:", value=launchtime, inline=True)
             embed.add_field(name="Launches in:", value=cd, inline=True)
             embed.add_field(name="Launches From:", value=f"{launchpadresponse['full_name']}, {launchpadresponse['region']}", inline=False)
-        await context.send(embed=embed)
-        await context.message.delete()
+            webhook = await context.channel.create_webhook(name="lidstuff")
+            await webhook.send(embed=embed, username=context.message.author.display_name, avatar_url=context.message.author.avatar_url)
+            await webhook.delete()
+            await context.message.delete()
 
 
     @commands.command(name="reverse", aliases=["backwards", "reverseit"])
@@ -796,7 +803,6 @@ class general(commands.Cog, name="general"):
         await user.send(matchlist)
         await context.send(f"DM sent to {user.mention}")
         await context.message.delete()
-
 
     async def convertcurrency(self, amount, fromcurrency, tocurrency):
         currencyurl=f"https://v6.exchangerate-api.com/v6/{config.EXCHANGERATE_API_KEY}/latest/{fromcurrency}"
