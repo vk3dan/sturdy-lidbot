@@ -648,8 +648,8 @@ class general(commands.Cog, name="general"):
     async def addquote(self, context, *args):
         """
         Add a quote (server specific)
-        Usage: !addquote <MessageID>
-           Or: !addquote <DisplayName> <quote>
+        Usage: !addquote MessageID
+           Or: !addquote <DisplayName> quotetext (Display Name must be inside '<' and '>' if there are spaces in the name otherwise optional)
         """
         if len(args)==0:
             embed = discord.Embed(
@@ -676,6 +676,10 @@ class general(commands.Cog, name="general"):
             if name==None or name=="" or name=="None":
                 name=msg.author.display_name
             quote=msg.content
+        elif str(args[0]).startswith("<"):
+            inputstring=' '.join(args)
+            name=re.search('<(.*?)>', inputstring).group()
+            start, sep, quote=inputstring.partition('> ')
         else:
             name=args[0]
             name=name.replace('>','')
