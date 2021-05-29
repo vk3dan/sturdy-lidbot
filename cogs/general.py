@@ -791,7 +791,7 @@ class general(commands.Cog, name="general"):
                         matchlist+=f"Quotes found for server ***{context.message.guild}***:\n"
                     matchlist+=f"Quote {i}: {name}: {quote}\n"
         if matchlist=="":
-            matchlist+=f"No quotes found matching {keyword.lower()}"
+            matchlist+=f"No quotes found matching {keyword.lower()} for server ***{context.message.guild}***"
         user=context.message.author
         await user.send(matchlist)
         await context.send(f"DM sent to {user.mention}")
