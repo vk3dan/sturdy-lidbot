@@ -379,6 +379,7 @@ class general(commands.Cog, name="general"):
             inline=True
         )
         embed_message = await context.send(embed=embed)
+        await context.message.delete()
         await embed_message.add_reaction("🇬")
         await embed_message.add_reaction("🇴")
         await embed_message.add_reaction("🇳")

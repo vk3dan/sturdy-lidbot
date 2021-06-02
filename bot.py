@@ -119,7 +119,7 @@ async def on_message(message):
 			elif message.content == "88":
 				await message.add_reaction("🫂")
 				await message.add_reaction("💋")
-			elif "gonk" in message.content.lower():
+			elif "gonk" in message.content.lower() and not message.content.startswith("!"):
 				await message.add_reaction("🇬")
 				await message.add_reaction("🇴")
 				await message.add_reaction("🇳")
