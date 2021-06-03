@@ -1,4 +1,4 @@
-import os, sys, discord, platform, random, aiohttp, json, re, xmltodict, time, csv, wget
+import os, sys, discord, platform, random, aiohttp, json, re, xmltodict, time, csv, wget, subprocess, xml.etree.ElementTree
 from discord.ext import commands
 import urllib.parse
 if not os.path.isfile("config.py"):
@@ -201,32 +201,42 @@ class ham(commands.Cog, name="ham"):
                     break
                 else:
                     redditor=0
-        qrzpassword=urllib.parse.quote(config.QRZ_PASSWORD, safe='')
-        keyurl = f"https://xmldata.qrz.com/xml/current/?username={config.QRZ_USERNAME};password={qrzpassword}"
-        async with aiohttp.ClientSession() as session:
-            raw_response = await session.get(keyurl)
-            response = await raw_response.text()
-            response = xmltodict.parse(response)
-            sessionkey=response['QRZDatabase']['Session']['Key']
-            url = f"https://xmldata.qrz.com/xml/current/?s={sessionkey};callsign={cleanargs.upper()}"
-            raw_response = await session.get(url)
-            response = await raw_response.text()
-            response = xmltodict.parse(response)
+#        qrzpassword=urllib.parse.quote(config.QRZ_PASSWORD, safe='')
+#        keyurl = f"https://xmldata.qrz.com/xml/current/?username={config.QRZ_USERNAME};password={qrzpassword}"
+#        async with aiohttp.ClientSession() as session:
+#            raw_response = await session.get(keyurl)
+#            response = await raw_response.text()
+#            response = xmltodict.parse(response)
+#            sessionkey=response['QRZDatabase']['Session']['Key']
+#            url = f"https://xmldata.qrz.com/xml/current/?s={sessionkey};callsign={cleanargs.upper()}"
+#            raw_response = await session.get(url)
+#            response = await raw_response.text()
+        response=subprocess.check_output(f"./qrz --xml {callsign}",shell=True)
+        response=xmltodict.parse(response)
+        print(response)
         if redditor==1:
             qrzlogo=file = discord.File("images/qrz+reddit.png", filename="qrz.png")
         else:
             qrzlogo=file = discord.File("images/qrz.png", filename="qrz.png")
         try:
+            callsign=response['QRZDatabase']['Callsign']['call']
             embed = discord.Embed(
                 title=f"QRZ lookup result:",
                 color=0x00FF00
             )
             embed.add_field(
                 name="Callsign:",
-                value=f"[{response['QRZDatabase']['Callsign']['call']}](https://www.qrz.com/db/{response['QRZDatabase']['Callsign']['call']})",
-                inline=False
+                value=f"[{callsign}](https://www.qrz.com/db/{callsign})",
+                inline=True
             )
-            callsign=response['QRZDatabase']['Callsign']['call']
+            try:
+                embed.add_field(
+                    name="Aliases:",
+                    value=response['QRZDatabase']['Callsign']['aliases'],
+                    inline=True
+                )
+            except:
+                pass
             try:
                 firstname=response['QRZDatabase']['Callsign']['fname']
                 lastname=response['QRZDatabase']['Callsign']['name']
@@ -241,22 +251,53 @@ class ham(commands.Cog, name="ham"):
                         name=""
             embed.add_field(
                 name="Name:",
-                value=f"{name}",
-                inline=False
+                value=name,
+                inline=True
             )
+            try:
+                embed.add_field(
+                    name="Born:",
+                    value=response['QRZDatabase']['Callsign']['born'],
+                    inline=True
+                )
+            except:
+                pass
+            try:
+                embed.add_field(
+                    name="QSL via:",
+                    value=response['QRZDatabase']['Callsign']['qslmgr'],
+                    inline=True
+                )
+            except:
+                pass
+            try:
+                embed.add_field(
+                    name="Email:",
+                    value=response['QRZDatabase']['Callsign']['email'],
+                    inline=True
+                )
+            except:
+                pass
             if redditor==1 and redditname!="":
                 embed.add_field(
                     name="Reddit:",
                     value=redditname[1:],
-                    inline=False
+                    inline=True
                 )
             else:
                 pass
-            embed.add_field(
-                name="QTH:",
-                value=response['QRZDatabase']['Callsign']['addr2'],            
-                inline=True
-            )
+            try:
+                embed.add_field(
+                    name="QTH:",
+                    value=f"{response['QRZDatabase']['Callsign']['addr1']}, {response['QRZDatabase']['Callsign']['addr2']}",            
+                    inline=True
+                )
+            except:
+                embed.add_field(
+                    name="QTH:",
+                    value=response['QRZDatabase']['Callsign']['addr2'],            
+                    inline=True
+                )
             try:
                 embed.add_field(
                     name="State:",
@@ -270,6 +311,14 @@ class ham(commands.Cog, name="ham"):
                 value=response['QRZDatabase']['Callsign']['country'],
                 inline=True
             )
+            try:
+                embed.add_field(
+                    name="Grid:",
+                    value=response['QRZDatabase']['Callsign']['grid'],
+                    inline=True
+                )
+            except:
+                pass
         except:
             embed=discord.Embed(
                 title=f":warning: QRZ error:",
