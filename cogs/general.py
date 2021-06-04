@@ -819,7 +819,7 @@ class general(commands.Cog, name="general"):
         geo = GoogleV3(api_key=config.GOOGLEGEO_API_KEY, user_agent="lidbot")
         try:
             output = geo.geocode(location).raw
-            print(output)
+            print(f"Google geocode request for {output['formatted_address']}")
         except:
             return 1
         return output
