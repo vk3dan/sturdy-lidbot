@@ -1,4 +1,5 @@
 import os, sys, discord, platform, random, aiohttp, json, re, wolframalpha, subprocess, discord.ext
+from discord.embeds import Embed
 from time import strftime
 from discord.ext import commands
 from currency_symbols import CurrencySymbols
@@ -213,10 +214,13 @@ class general(commands.Cog, name="general"):
                 inline=False
             )
             embed.set_thumbnail(url="https://upload.wikimedia.org/wikipedia/commons/thumb/4/46/Bitcoin.svg/256px-Bitcoin.svg.png")
-            webhook = await context.channel.create_webhook(name="lidstuff")
-            await webhook.send(embed=embed, username=context.message.author.display_name, avatar_url=context.message.author.avatar_url)
-            await webhook.delete()
-            await context.message.delete()
+            if not isinstance(context.message.channel, discord.channel.DMChannel):
+                webhook = await context.channel.create_webhook(name="lidstuff")
+                await webhook.send(embed=embed, username=context.message.author.display_name, avatar_url=context.message.author.avatar_url)
+                await webhook.delete()
+                await context.message.delete()
+            else:
+                await context.send(embed=embed)
 
     @commands.command(name="doge", aliases=["dogecoin"])
     async def dogecoin(self, context,*,args=""):
@@ -285,10 +289,13 @@ class general(commands.Cog, name="general"):
                     inline=False
                 )
             embed.set_thumbnail(url="https://cdn.discordapp.com/emojis/829928818508431400.png")
-            webhook = await context.channel.create_webhook(name="lidstuff")
-            await webhook.send(embed=embed, username=context.message.author.display_name, avatar_url=context.message.author.avatar_url)
-            await webhook.delete()
-            await context.message.delete()
+            if not isinstance(context.message.channel, discord.channel.DMChannel):
+                webhook = await context.channel.create_webhook(name="lidstuff")
+                await webhook.send(embed=embed, username=context.message.author.display_name, avatar_url=context.message.author.avatar_url)
+                await webhook.delete()
+                await context.message.delete()
+            else:
+                await context.send(embed=embed)
 
     @commands.command(name="cat", aliases=["kitty","neko"])
     async def kitty(self, context):
@@ -314,10 +321,13 @@ class general(commands.Cog, name="general"):
                 embed.set_image(url=f"https://i.redd.it/{response[0]['data']['children'][0]['data']['gallery_data']['items'][0]['media_id']}.jpg")
             except:
                 embed.set_image(url=response[0]['data']['children'][0]['data']['url'])
-        webhook = await context.channel.create_webhook(name="lidstuff")
-        await webhook.send(embed=embed, username=context.message.author.display_name, avatar_url=context.message.author.avatar_url)
-        await webhook.delete()
-        await context.message.delete()
+        if not isinstance(context.message.channel, discord.channel.DMChannel):
+            webhook = await context.channel.create_webhook(name="lidstuff")
+            await webhook.send(embed=embed, username=context.message.author.display_name, avatar_url=context.message.author.avatar_url)
+            await webhook.delete()
+            await context.message.delete()
+        else:
+            await context.send(embed=embed)
 
     @commands.command(name="stonk", aliases=["stock"])
     async def stonk(self, context, *, args):
@@ -360,10 +370,13 @@ class general(commands.Cog, name="general"):
                     description=f"{response['quoteResponse']['result'][0]['symbol']} market price is: {cursymbol}{regularMarketPrice} {response['quoteResponse']['result'][0]['financialCurrency']} ( {directionEmoji} {cursymbol}{regularMarketChange} | {regularMarketChangePercent}% change )",
                     color=0x00FF00
                 )
-            webhook = await context.channel.create_webhook(name="lidstuff")
-            await webhook.send(embed=embed, username=context.message.author.display_name, avatar_url=context.message.author.avatar_url)
-            await webhook.delete()
-            await context.message.delete()
+            if not isinstance(context.message.channel, discord.channel.DMChannel):
+                webhook = await context.channel.create_webhook(name="lidstuff")
+                await webhook.send(embed=embed, username=context.message.author.display_name, avatar_url=context.message.author.avatar_url)
+                await webhook.delete()
+                await context.message.delete()
+            else:
+                await context.send(embed=embed)
 
     @commands.command(name="gonk")
     async def gonk(self, context):
@@ -401,10 +414,13 @@ class general(commands.Cog, name="general"):
                 color=0x00FF00
             )
             embed.set_image(url=response['hdurl'])
+        if not isinstance(context.message.channel, discord.channel.DMChannel):
             webhook = await context.channel.create_webhook(name="lidstuff")
             await webhook.send(embed=embed, username=context.message.author.display_name, avatar_url=context.message.author.avatar_url)
             await webhook.delete()
             await context.message.delete()
+        else:
+            await context.send(embed=embed)
 
     @commands.command(name="wx", aliases=["weather"])
     async def wx(self, context, *, args):
@@ -477,10 +493,13 @@ class general(commands.Cog, name="general"):
                     embed.add_field(name=f"**ALERT: {response['alerts']['event']}** from {response['alerts']['sender_name']}", value=f"{response['alerts']['description']}", inline=False)
                 except:
                     pass
-            webhook = await context.channel.create_webhook(name="lidstuff")
-            await webhook.send(embed=embed, username=context.message.author.display_name, avatar_url=context.message.author.avatar_url)
-            await webhook.delete()
-            await context.message.delete()
+            if not isinstance(context.message.channel, discord.channel.DMChannel):
+                webhook = await context.channel.create_webhook(name="lidstuff")
+                await webhook.send(embed=embed, username=context.message.author.display_name, avatar_url=context.message.author.avatar_url)
+                await webhook.delete()
+                await context.message.delete()
+            else:
+                await context.send(embed=embed)
 
     @commands.command(name="ask", aliases=["wolfram"])
     async def askwolfram(self, context, *, args):
@@ -552,10 +571,13 @@ class general(commands.Cog, name="general"):
             )
             embed.add_field(name="Input", value=f"{inputcursymbol}{float(cleaninputamount):,.2f} {in_cur}", inline=True)
             embed.add_field(name="Output", value=f"{outputcursymbol}{float(convertedamount):,.2f} {out_cur}", inline=True)
-            webhook = await context.channel.create_webhook(name="lidstuff")
-            await webhook.send(embed=embed, username=context.message.author.display_name, avatar_url=context.message.author.avatar_url)
-            await webhook.delete()
-            await context.message.delete()
+            if not isinstance(context.message.channel, discord.channel.DMChannel):
+                webhook = await context.channel.create_webhook(name="lidstuff")
+                await webhook.send(embed=embed, username=context.message.author.display_name, avatar_url=context.message.author.avatar_url)
+                await webhook.delete()
+                await context.message.delete()
+            else:
+                await context.send(embed=embed)
 
     @commands.command(name="spacex")
     async def spacex(self, context):
@@ -599,11 +621,13 @@ class general(commands.Cog, name="general"):
             embed.add_field(name="Launches in:", value=cd, inline=True)
             embed.add_field(name="Launches From:", value=f"{launchpadresponse['full_name']}, {launchpadresponse['region']}", inline=False)
             embed.add_field(name="Details:", value=response['details'])
-            webhook = await context.channel.create_webhook(name="lidstuff")
-            await webhook.send(embed=embed, username=context.message.author.display_name, avatar_url=context.message.author.avatar_url)
-            await webhook.delete()
-            await context.message.delete()
-
+            if not isinstance(context.message.channel, discord.channel.DMChannel):
+                webhook = await context.channel.create_webhook(name="lidstuff")
+                await webhook.send(embed=embed, username=context.message.author.display_name, avatar_url=context.message.author.avatar_url)
+                await webhook.delete()
+                await context.message.delete()
+            else:
+                await context.send(embed=embed)
 
     @commands.command(name="reverse", aliases=["backwards", "reverseit"])
     async def reverseit(self, context, *, args):
@@ -660,6 +684,14 @@ class general(commands.Cog, name="general"):
         Usage: !addquote MessageID
            Or: !addquote <DisplayName> quotetext (Display Name must be inside '<' and '>' if there are spaces in the name otherwise optional)
         """
+        if isinstance(context.message.channel, discord.channel.DMChannel):
+            embed = discord.Embed(
+                title=":warning: Error",
+                description="Error adding quote: This command cannot be used in a DM as quotes can only be added from the server the quote should be associated with.\nPlease try again in a server channel.",
+                color=0xFF0000
+            )
+            await context.send(embed=embed)
+            return 1
         if len(args)==0:
             embed = discord.Embed(
                 title=":warning: Error",
@@ -727,6 +759,14 @@ class general(commands.Cog, name="general"):
         Usage: !quote
            Or: !quote <quotenumber>
         """
+        if isinstance(context.message.channel, discord.channel.DMChannel):
+            embed = discord.Embed(
+                title=":warning: Error",
+                description="Error: Quotes can only be accessed from the server they are associated with.\nPlease try again from a server channel.",
+                color=0xFF0000
+            )
+            await context.send(embed=embed)
+            return 1
         quotefile=f"resources/{context.message.guild.id}quotes.json"
         if os.path.isfile(quotefile):
             print(f"{quotefile} found")
@@ -768,6 +808,14 @@ class general(commands.Cog, name="general"):
         Find a quote (server specific). Returns quotes via DM
         Usage: !quotesearch <keyword>
         """
+        if isinstance(context.message.channel, discord.channel.DMChannel):
+            embed = discord.Embed(
+                title=":warning: Error",
+                description="Error: Quotes can only be searched from the server they are associated with.\nPlease try again from a server channel.",
+                color=0xFF0000
+            )
+            await context.send(embed=embed)
+            return 1
         quotefile=f"resources/{context.message.guild.id}quotes.json"
         if os.path.isfile(quotefile):
             print(f"{quotefile} found")

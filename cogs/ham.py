@@ -1,4 +1,5 @@
 import os, sys, discord, platform, random, aiohttp, json, re, xmltodict, time, csv, wget, subprocess, xml.etree.ElementTree
+from discord import embeds
 from discord.ext import commands
 import urllib.parse
 if not os.path.isfile("config.py"):
@@ -25,10 +26,13 @@ class ham(commands.Cog, name="ham"):
             inline=True
         )
         embed.set_image(url="http://www.hamqsl.com/solarbc.php")
-        webhook = await context.channel.create_webhook(name="lidstuff")
-        await webhook.send(embed=embed, username=context.message.author.display_name, avatar_url=context.message.author.avatar_url)
-        await webhook.delete()
-        await context.message.delete()
+        if not isinstance(context.message.channel, discord.channel.DMChannel):
+            webhook = await context.channel.create_webhook(name="lidstuff")
+            await webhook.send(embed=embed, username=context.message.author.display_name, avatar_url=context.message.author.avatar_url)
+            await webhook.delete()
+            await context.message.delete()
+        else:
+            await context.send(embed=embed)
 
     @commands.command(name="solar")
     async def solar(self, context):
@@ -44,10 +48,13 @@ class ham(commands.Cog, name="ham"):
             inline=True
         )
         embed.set_image(url="https://www.hamqsl.com/solarn0nbh.php?image=sdo_131")
-        webhook = await context.channel.create_webhook(name="lidstuff")
-        await webhook.send(embed=embed, username=context.message.author.display_name, avatar_url=context.message.author.avatar_url)
-        await webhook.delete()
-        await context.message.delete()
+        if not isinstance(context.message.channel, discord.channel.DMChannel):
+            webhook = await context.channel.create_webhook(name="lidstuff")
+            await webhook.send(embed=embed, username=context.message.author.display_name, avatar_url=context.message.author.avatar_url)
+            await webhook.delete()
+            await context.message.delete()
+        else:
+            await context.send(embed=embed)
 
     @commands.command(name="dmr", aliases=["dmrid"])
     async def dmr(self, context, *, args):
@@ -116,10 +123,13 @@ class ham(commands.Cog, name="ham"):
                     value=response['results'][0]['country'],
                     inline=True
                 )
-        webhook = await context.channel.create_webhook(name="lidstuff")
-        await webhook.send(embed=embed, username=f"{callsign} (for {context.message.author.display_name})", avatar_url=context.message.author.avatar_url)
-        await webhook.delete()
-        await context.message.delete()
+        if not isinstance(context.message.channel, discord.channel.DMChannel):
+            webhook = await context.channel.create_webhook(name="lidstuff")
+            await webhook.send(embed=embed, username=f"{callsign} (for {context.message.author.display_name})", avatar_url=context.message.author.avatar_url)
+            await webhook.delete()
+            await context.message.delete()
+        else:
+            await context.send(embed=embed)
 
     @commands.command(name="morse", aliases=["cw"])
     async def morse(self, context, *, args):
@@ -136,10 +146,13 @@ class ham(commands.Cog, name="ham"):
             except KeyError:
                 outputtext += ":shrug:"
             outputtext += " "
-        webhook = await context.channel.create_webhook(name="lidstuff")
-        await webhook.send(outputtext, username=context.message.author.display_name, avatar_url=context.message.author.avatar_url)
-        await webhook.delete()
-        await context.message.delete()
+        if not isinstance(context.message.channel, discord.channel.DMChannel):
+            webhook = await context.channel.create_webhook(name="lidstuff")
+            await webhook.send(outputtext, username=context.message.author.display_name, avatar_url=context.message.author.avatar_url)
+            await webhook.delete()
+            await context.message.delete()
+        else:
+            await context.send(outputtext)
 
     @commands.command(name="demorse", aliases=["unmorse","uncw"])
     async def demorse(self, context, *, args):
@@ -163,10 +176,13 @@ class ham(commands.Cog, name="ham"):
                 except KeyError:
                     outputtext += ":shrug:"
             outputtext += " "
-        webhook = await context.channel.create_webhook(name="lidstuff")
-        await webhook.send(outputtext, username=context.message.author.display_name, avatar_url=context.message.author.avatar_url)
-        await webhook.delete()
-        await context.message.delete()
+        if not isinstance(context.message.channel, discord.channel.DMChannel):
+            webhook = await context.channel.create_webhook(name="lidstuff")
+            await webhook.send(outputtext, username=context.message.author.display_name, avatar_url=context.message.author.avatar_url)
+            await webhook.delete()
+            await context.message.delete()
+        else:
+            await context.send(outputtext)
 
     @commands.command(name="qrz", aliases=["call","lookup","dox"])
     async def qrz(self, context, *, args):
@@ -334,10 +350,13 @@ class ham(commands.Cog, name="ham"):
                 color=0xFF0000
             )
         embed.set_thumbnail(url=f"attachment://qrz.png")
-        webhook = await context.channel.create_webhook(name="lidstuff")
-        await webhook.send(file=qrzlogo, embed=embed, username=f"{callsign} (for {context.message.author.display_name})", avatar_url=context.message.author.avatar_url)
-        await webhook.delete()
-        await context.message.delete()
+        if not isinstance(context.message.channel, discord.channel.DMChannel):
+            webhook = await context.channel.create_webhook(name="lidstuff")
+            await webhook.send(file=qrzlogo, embed=embed, username=f"{callsign} (for {context.message.author.display_name})", avatar_url=context.message.author.avatar_url)
+            await webhook.delete()
+            await context.message.delete()
+        else:
+            await context.send(file=qrzlogo, embed=embed)
 
     @commands.command(name="dxcc", aliases=["country"])
     async def dxcc(self, context, *, args):
@@ -410,10 +429,13 @@ class ham(commands.Cog, name="ham"):
                 description=f"DXCC {cleanargs.upper()} not found",
                 color=0xFF0000
             )
-        webhook = await context.channel.create_webhook(name="lidstuff")
-        await webhook.send(embed=embed, username=f"{dxcc} (for {context.message.author.display_name})", avatar_url=context.message.author.avatar_url)
-        await webhook.delete()
-        await context.message.delete()
+        if not isinstance(context.message.channel, discord.channel.DMChannel):
+            webhook = await context.channel.create_webhook(name="lidstuff")
+            await webhook.send(embed=embed, username=f"{dxcc} (for {context.message.author.display_name})", avatar_url=context.message.author.avatar_url)
+            await webhook.delete()
+            await context.message.delete()
+        else:
+            await context.send(embed=embed)
 
 
 def setup(bot):
