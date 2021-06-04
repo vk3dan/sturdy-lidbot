@@ -300,6 +300,14 @@ class ham(commands.Cog, name="ham"):
                 )
             try:
                 embed.add_field(
+                    name="Attn:",
+                    value=response['QRZDatabase']['Callsign']['attn'],            
+                    inline=True
+                )
+            except:
+                pass
+            try:
+                embed.add_field(
                     name="State:",
                     value=response['QRZDatabase']['Callsign']['state'],
                     inline=True
