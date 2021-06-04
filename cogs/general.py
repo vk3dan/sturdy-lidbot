@@ -2,7 +2,7 @@ import os, sys, discord, platform, random, aiohttp, json, re, wolframalpha, subp
 from time import strftime
 from discord.ext import commands
 from currency_symbols import CurrencySymbols
-from geopy.geocoders import Nominatim
+from geopy.geocoders import GoogleV3
 from discord import Webhook, RequestsWebhookAdapter
 from datetime import datetime, time
 from dateutil import relativedelta, tz
@@ -422,7 +422,7 @@ class general(commands.Cog, name="general"):
                 )
             await context.send(embed=embed)
             return 1
-        url = f"https://api.openweathermap.org/data/2.5/onecall?lat={location['lat']}&lon={location['lon']}&exclude=minutely,hourly&appid="+config.OPENWEATHER_API_KEY
+        url = f"https://api.openweathermap.org/data/2.5/onecall?lat={location['geometry']['location']['lat']}&lon={location['geometry']['location']['lng']}&exclude=minutely,hourly&appid="+config.OPENWEATHER_API_KEY
         print(url)
         # Async HTTP request
         async with aiohttp.ClientSession() as session:
@@ -461,7 +461,7 @@ class general(commands.Cog, name="general"):
                 )
             else:
                 embed = discord.Embed(
-                    title=f":sun_with_face: Weather for {location['display_name']}",
+                    title=f":sun_with_face: Weather for {location['formatted_address']}",
                     description=f"**Current Conditions:** {response['current']['weather'][0]['description'].capitalize()}",
                     color=0x00FF00
                 )
@@ -816,9 +816,10 @@ class general(commands.Cog, name="general"):
             return answer
 
     async def geocode(self, location):
-        geo = Nominatim(user_agent="lidbot")
+        geo = GoogleV3(api_key=config.GOOGLEGEO_API_KEY, user_agent="lidbot")
         try:
             output = geo.geocode(location).raw
+            print(output)
         except:
             return 1
         return output
