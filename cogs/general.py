@@ -700,8 +700,11 @@ class general(commands.Cog, name="general"):
             )
             await context.send(embed=embed)
             return 1
-        elif args[0].isdecimal():
-            msgID=args[0]
+        elif args[0].isdecimal() or args[0].startswith("http"):
+            if args[0].isdecimal():
+                msgID=args[0]
+            else:
+                msgID=args[0].rsplit('/', 1)[-1]
             try:
                 msg = await context.message.channel.fetch_message(msgID)
             except:
