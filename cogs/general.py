@@ -744,7 +744,7 @@ class general(commands.Cog, name="general"):
             quotejson.write(data)
         embed = discord.Embed(
             title="Quote added",
-            description=f"Added quote \"{name}: {quote}\" to quotes",
+            description=f"Added quote {quotenum} - \"{name}: {quote}\" to quotes",
             color=0x00FF00
         )
         webhook = await context.channel.create_webhook(name="lidstuff")
