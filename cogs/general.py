@@ -727,6 +727,8 @@ class general(commands.Cog, name="general"):
         else:
             name=args[0]
             quote=' '.join(args[1:])
+        if name.endswith(":"):
+            name= re.sub(r'(:)(?=$)',r'',name)
         quotefile=f"resources/{context.message.guild.id}quotes.json"
         justincaseempty=open(quotefile,"a")
         justincaseempty.close
