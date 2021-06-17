@@ -167,7 +167,7 @@ class general(commands.Cog, name="general"):
                    'Yes - definitely.', 'As I see, yes.', 'Most likely.', 'Outlook good.', 'Yes.',
                    'Signs point to yes.', 'Reply hazy, try again.', 'Ask again later.', 'Better not tell you now.',
                    'Cannot predict now.', 'Concentrate and ask again later.', 'Don\'t count on it.', 'My reply is no.',
-                   'My sources say no.', 'Outlook not so good.', 'Very doubtful.', 'Suck my dongus ya fuckin\' nerd']
+                   'My sources say no.', 'Outlook not so good.', 'Very doubtful.', 'Eat my dongus ya fuckin\' nerd']
         embed = discord.Embed(
             title="**My Answer:**",
             description=f"{random.choice(answers)}",
