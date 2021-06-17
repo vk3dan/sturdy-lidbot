@@ -233,7 +233,7 @@ class general(commands.Cog, name="general"):
             cur=cleanargs.upper()
         else:
             cur="USD"
-        url = "https://my.dogechain.info/api/v2/get_price/doge/usd"
+        url = "https://sochain.com/api/v2/get_price/DOGE/USD"
         # Async HTTP request
         async with aiohttp.ClientSession() as session:
             raw_response = await session.get(url)
