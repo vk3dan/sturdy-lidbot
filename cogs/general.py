@@ -692,6 +692,7 @@ class general(commands.Cog, name="general"):
             )
             await context.send(embed=embed)
             return 1
+        inputstring=' '.join(args)
         if len(args)==0:
             embed = discord.Embed(
                 title=":warning: Error",
@@ -720,9 +721,17 @@ class general(commands.Cog, name="general"):
             if name==None or name=="" or name=="None":
                 name=msg.author.display_name
             quote=msg.content
+        elif str(args[0]).startswith("["):
+            inputstring=re.sub(r'\[.+?\] ', '', inputstring)
+            if inputstring.startswith("<"):
+                name, sep, quote=inputstring.partition('> ')
+                if quote=="":
+                    name, sep, quote=inputstring.partition('>: ')
+                name = name[1:]
         elif str(args[0]).startswith("<"):
-            inputstring=' '.join(args)
             name, sep, quote=inputstring.partition('> ')
+            if quote=="":
+                name, sep, quote=inputstring.partition('>: ')
             name = name[1:]
         else:
             name=args[0]
