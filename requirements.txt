@@ -5,3 +5,5 @@ currency-symbols
 wget
 xmltodict
 geopy
+dateutil
+maidenhead
