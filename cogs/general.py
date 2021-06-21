@@ -1,9 +1,10 @@
-import os, sys, discord, platform, random, aiohttp, json, re, wolframalpha, subprocess, discord.ext
+import os, sys, discord, platform, random, aiohttp, json, re, wolframalpha, subprocess, math, discord.ext, maidenhead
 from discord.embeds import Embed
 from time import strftime
 from discord.ext import commands
 from currency_symbols import CurrencySymbols
 from geopy.geocoders import GoogleV3
+from geopy.distance import geodesic
 from discord import Webhook, RequestsWebhookAdapter
 from datetime import datetime, time
 from dateutil import relativedelta, tz
@@ -423,12 +424,28 @@ class general(commands.Cog, name="general"):
             await context.send(embed=embed)
 
     @commands.command(name="wx", aliases=["weather"])
-    async def wx(self, context, *, args):
+    async def wx(self, context, *args):
         """
         Usage: !wx <location>
         Fetch the weather for the place requested.
         """
-        cleanargs=re.sub(r'[^a-zA-Z0-9\, -]','', args)
+        user=context.message.author.id
+        qthfile=f"resources/locations.json"
+        justincaseempty=open(qthfile,"a")
+        justincaseempty.close
+        with open(qthfile,"r") as qthjson:
+            try:
+                data = json.loads(qthjson.read())
+                try:
+                    coords = data[f"{user}"]
+                except:
+                    pass
+            except:
+                pass
+        if coords:
+            cleanargs=coords
+        else:
+            cleanargs=re.sub(r'[^a-zA-Z0-9\,. -]','', args)
         location=await self.geocode(cleanargs)
         if location==1:    
             embed = discord.Embed(
@@ -868,6 +885,71 @@ class general(commands.Cog, name="general"):
         await context.send(f"DM sent to {user.mention}")
         await context.message.delete()
 
+    @commands.command(name="setgeo")
+    async def setgeo(self, context, *args):
+        """
+        Usage: !setgeo <location>
+        Set your location. location can be text (eg: "Melbourne vic"), decimal coords (eg: "-37.8136,144.9631", or grid square.)
+        This will mean you don't need to input your location when using !wx unless you want a different location.
+        """
+        if len(args)==0:
+            embed = discord.Embed(
+                title=":warning: Error",
+                description="Error: No location provided.\nUsage: !setgeo <location>\nlocation can be text (eg: \"Melbourne vic\"), decimal coords (eg: \"-37.8136,144.9631\", or grid square. eg: \"QF22le\"",
+                color=0xFF0000
+            )
+            await context.send(embed=embed) 
+            return 1
+        qthfile="resources/locations.json"
+        justincaseempty=open(qthfile,"a")
+        justincaseempty.close
+        with open(qthfile,"r") as qthjson:
+            try:
+                data = json.loads(qthjson.read())
+            except:
+                data={}
+        user=context.message.author.id
+        qthjson=""
+        coords=[]
+        argstr=' '.join(args)
+        if re.search("^[-+]?[0-9]*\.?[0-9]+[, ]+[-+]?[0-9]*\.?[0-9]+",argstr):
+            coords=argstr.split(',')
+            if coords[1].startswith(" "):
+                coords[1][:1]
+            coords=[float(i) for i in coords]
+            print(coords)
+        elif re.match("[a-zA-Z][a-zA-Z][0-9]+", argstr):
+            coords=list(maidenhead.to_location(argstr,center=True))
+        else:
+            try:
+                location = await self.geocode(argstr)
+                coords = [location['geometry']['location']['lat'], location['geometry']['location']['lng']]
+                print(coords)
+            except:
+                embed = discord.Embed(
+                    title=":warning: Error",
+                    description="Error: Input error.\nUsage: !setgeo <location>\nlocation can be text (eg: \"Melbourne vic\"), decimal coords (eg: \"-37.8136,144.9631\", or grid square. eg: \"QF22le\"",
+                    color=0xFF0000
+                )
+                await context.send(embed=embed) 
+                return 1
+        print(coords)
+        data[str(user)]=[coords[0],coords[1]]
+        with open(qthfile,"w") as qthjson:
+            json.dump(data,qthjson,indent=4)
+        embed = discord.Embed(
+            title="QTH set.",
+            description=f"QTH set to {coords}",
+            color=0x00FF00
+        )
+        if not isinstance(context.message.channel, discord.channel.DMChannel):
+            webhook = await context.channel.create_webhook(name="lidstuff")
+            await webhook.send(embed=embed, username=context.message.author.display_name, avatar_url=context.message.author.avatar_url)
+            await webhook.delete()
+            await context.message.delete()
+        else:
+            await context.send(embed=embed) 
+
     async def convertcurrency(self, amount, fromcurrency, tocurrency):
         currencyurl=f"https://v6.exchangerate-api.com/v6/{config.EXCHANGERATE_API_KEY}/latest/{fromcurrency}"
         async with aiohttp.ClientSession() as session:
@@ -885,6 +967,19 @@ class general(commands.Cog, name="general"):
         except:
             return 1
         return output
+
+    async def howfar(self, startlat, startlon, finishlat, finishlon):
+        startloc=(startlat,startlon)
+        finishloc=(finishlat,finishlon)
+        dLon = math.radians(finishlon) - math.radians(startlon)
+        y = math.sin(dLon) * math.cos(math.radians(finishlat))
+        x = math.cos(math.radians(startlat))*math.sin(math.radians(finishlat)) - math.sin(math.radians(startlat))*math.cos(math.radians(finishlat))*math.cos(dLon)
+        bearing = math.degrees(math.atan2(y, x))
+        if bearing < 0:
+            bearing+= 360
+        direction=await direction_from_degrees(bearing)
+        output=[geodesic(startloc, finishloc).km, bearing, direction]
+        return(output)
 
     async def direction_from_degrees(self, degrees):
         directions = ["N", "NNE", "NE", "ENE", "E", "ESE", "SE", "SSE", "S", "SSW", "SW", "WSW", "W", "WNW", "NW", "NNW", "N"]

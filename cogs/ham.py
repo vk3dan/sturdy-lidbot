@@ -343,6 +343,32 @@ class ham(commands.Cog, name="ham"):
                 )
             except:
                 pass
+            try:
+                user=context.message.author.id
+                qthfile=f"resources/locations.json"
+                justincaseempty=open(qthfile,"a")
+                justincaseempty.close
+                with open(qthfile,"r") as qthjson:
+                    try:
+                        data = json.loads(qthjson.read())
+                        try:
+                            coords = data[f"{user}"]
+                        except:
+                            pass
+                    except:
+                        pass
+                if coords:
+                    howfar=await general.howfar(response['QRZDatabase']['DXCC']['lon'],response['QRZDatabase']['DXCC']['lat'],coords[0],coords[1])
+                    distance=howfar[0]
+                    bearing=howfar[1]
+                    direction=howfar[2]
+                    embed.add_field(
+                        name="Distance:",
+                        value=f"{distance} km, {bearing}°*({direction})*",
+                        inline=True
+                    )
+            except:
+                pass
         except:
             embed=discord.Embed(
                 title=f":warning: QRZ error:",
@@ -421,6 +447,7 @@ class ham(commands.Cog, name="ham"):
                 value=f"Lon: {response['QRZDatabase']['DXCC']['lon']}, Lat: {response['QRZDatabase']['DXCC']['lat']}",
                 inline=True
             )
+
 #            print(f"https://maps.geoapify.com/v1/staticmap?style=dark-matter-purple-roads&width=400&height=320&center=lonlat:{response['QRZDatabase']['DXCC']['lon']},{response['QRZDatabase']['DXCC']['lat']}&zoom=2&scaleFactor=1&marker=lonlat:{response['QRZDatabase']['DXCC']['lon']},{response['QRZDatabase']['DXCC']['lat']};type:awesome;color:%23e01401&apiKey={config.GEOAPIFY_API_KEY}")
 #            embed.set_image(url=f"https://maps.geoapify.com/v1/staticmap?style=dark-matter-purple-roads&width=400&height=320&center=lonlat:{response['QRZDatabase']['DXCC']['lon']},{response['QRZDatabase']['DXCC']['lat']}&zoom=2&scaleFactor=1&marker=lonlat:{response['QRZDatabase']['DXCC']['lon']},{response['QRZDatabase']['DXCC']['lat']};type:awesome&apiKey={config.GEOAPIFY_API_KEY}")
         except:
