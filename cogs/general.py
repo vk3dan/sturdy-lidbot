@@ -969,15 +969,15 @@ class general(commands.Cog, name="general"):
         return output
 
     async def howfar(self, startlat, startlon, finishlat, finishlon):
-        startloc=(startlat,startlon)
-        finishloc=(finishlat,finishlon)
+        startloc=(float(startlat),float(startlon))
+        finishloc=(float(finishlat),float(finishlon))
         dLon = math.radians(finishlon) - math.radians(startlon)
         y = math.sin(dLon) * math.cos(math.radians(finishlat))
         x = math.cos(math.radians(startlat))*math.sin(math.radians(finishlat)) - math.sin(math.radians(startlat))*math.cos(math.radians(finishlat))*math.cos(dLon)
         bearing = math.degrees(math.atan2(y, x))
         if bearing < 0:
             bearing+= 360
-        direction=await direction_from_degrees(bearing)
+        direction=await self.direction_from_degrees(bearing)
         output=[geodesic(startloc, finishloc).km, bearing, direction]
         return(output)
 

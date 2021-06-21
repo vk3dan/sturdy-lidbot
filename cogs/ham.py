@@ -1,6 +1,7 @@
-import os, sys, discord, platform, random, aiohttp, json, re, xmltodict, time, csv, wget, subprocess, xml.etree.ElementTree
+import os, sys, discord, platform, random, aiohttp, json, re, xmltodict, time, csv, wget, subprocess, xml.etree.ElementTree, math
 from discord import embeds
 from discord.ext import commands
+from geopy.distance import geodesic
 import urllib.parse
 if not os.path.isfile("config.py"):
     sys.exit("'config.py' not found! Please add it and try again.")
@@ -305,7 +306,7 @@ class ham(commands.Cog, name="ham"):
             try:
                 embed.add_field(
                     name="QTH:",
-                    value=f"{response['QRZDatabase']['Callsign']['addr1']}, {response['QRZDatabase']['Callsign']['addr2']}",            
+                    value=f"{response['QRZDatabase']['Callsign']['addr1']}\n{response['QRZDatabase']['Callsign']['addr2']}",            
                     inline=True
                 )
             except:
@@ -344,27 +345,30 @@ class ham(commands.Cog, name="ham"):
             except:
                 pass
             try:
-                user=context.message.author.id
+                user=str(context.message.author.id)
                 qthfile=f"resources/locations.json"
                 justincaseempty=open(qthfile,"a")
                 justincaseempty.close
+                coords=[]
                 with open(qthfile,"r") as qthjson:
                     try:
                         data = json.loads(qthjson.read())
                         try:
-                            coords = data[f"{user}"]
+                            print(data[user])
+                            coords = data[user]
                         except:
                             pass
                     except:
                         pass
                 if coords:
-                    howfar=await general.howfar(response['QRZDatabase']['DXCC']['lon'],response['QRZDatabase']['DXCC']['lat'],coords[0],coords[1])
+                    howfar=await self.howfar(float(coords[0]),float(coords[1]),float(response['QRZDatabase']['Callsign']['lat']),float(response['QRZDatabase']['Callsign']['lon']))
+                    print(howfar)
                     distance=howfar[0]
                     bearing=howfar[1]
                     direction=howfar[2]
                     embed.add_field(
                         name="Distance:",
-                        value=f"{distance} km, {bearing}°*({direction})*",
+                        value=f"{round(distance,2)} km\n{round(bearing)}° *({direction})*",
                         inline=True
                     )
             except:
@@ -464,6 +468,23 @@ class ham(commands.Cog, name="ham"):
         else:
             await context.send(embed=embed)
 
+    async def howfar(self, startlat, startlon, finishlat, finishlon):
+        startloc=(float(startlat),float(startlon))
+        finishloc=(float(finishlat),float(finishlon))
+        dLon = math.radians(finishlon) - math.radians(startlon)
+        y = math.sin(dLon) * math.cos(math.radians(finishlat))
+        x = math.cos(math.radians(startlat))*math.sin(math.radians(finishlat)) - math.sin(math.radians(startlat))*math.cos(math.radians(finishlat))*math.cos(dLon)
+        bearing = math.degrees(math.atan2(y, x))
+        if bearing < 0:
+            bearing+= 360
+        direction=await self.direction_from_degrees(bearing)
+        output=[geodesic(startloc, finishloc).km, bearing, direction]
+        return(output)
+
+    async def direction_from_degrees(self, degrees):
+        directions = ["N", "NNE", "NE", "ENE", "E", "ESE", "SE", "SSE", "S", "SSW", "SW", "WSW", "W", "WNW", "NW", "NNW", "N"]
+        compass_direction = round(degrees / 22.5)
+        return directions[compass_direction]
 
 def setup(bot):
     bot.add_cog(ham(bot))
