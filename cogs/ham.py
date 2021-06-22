@@ -346,7 +346,7 @@ class ham(commands.Cog, name="ham"):
                 pass
             try:
                 user=str(context.message.author.id)
-                qthfile=f"resources/locations.json"
+                qthfile="resources/locations.json"
                 justincaseempty=open(qthfile,"a")
                 justincaseempty.close
                 coords=[]

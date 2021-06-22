@@ -937,18 +937,38 @@ class general(commands.Cog, name="general"):
         data[str(user)]=[coords[0],coords[1]]
         with open(qthfile,"w") as qthjson:
             json.dump(data,qthjson,indent=4)
-        embed = discord.Embed(
-            title="QTH set.",
-            description=f"QTH set to {coords}",
-            color=0x00FF00
-        )
         if not isinstance(context.message.channel, discord.channel.DMChannel):
-            webhook = await context.channel.create_webhook(name="lidstuff")
-            await webhook.send(embed=embed, username=context.message.author.display_name, avatar_url=context.message.author.avatar_url)
-            await webhook.delete()
+            await context.send(f"DM sent to {context.message.author.mention}")
             await context.message.delete()
-        else:
-            await context.send(embed=embed) 
+        await context.message.author.send(f"QTH set to {coords}") 
+
+    @commands.command(name="getgeo")
+    async def getgeo(self, context, *args):
+        """
+        Usage: !getgeo <location>
+        Check your saved location. this will be sent to you as a DM
+        """
+        qthfile="resources/locations.json"
+        justincaseempty=open(qthfile,"a")
+        justincaseempty.close
+        coords=[]
+        user=context.message.author
+        userid=str(context.message.author.id)
+        with open(qthfile,"r") as qthjson:
+            try:
+                data = json.loads(qthjson.read())
+                try:
+                    coords = data[userid]
+                except:
+                    await user.send(f"Error: No QTH found for {user}")
+                    await context.send(f"DM sent to {user.mention}")
+                    return 1
+            except:
+                await context.send("Error opening location file.")
+        await user.send(f"Saved QTH is {coords}")
+        if not isinstance(context.message.channel, discord.channel.DMChannel):
+            await context.send(f"DM sent to {user.mention}")
+            await context.message.delete()
 
     async def convertcurrency(self, amount, fromcurrency, tocurrency):
         currencyurl=f"https://v6.exchangerate-api.com/v6/{config.EXCHANGERATE_API_KEY}/latest/{fromcurrency}"
