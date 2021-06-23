@@ -15,6 +15,7 @@ class Help(commands.Cog, name="help"):
         List all commands from every Cog the bot has loaded.
         """
         prefix = config.BOT_PREFIX
+        user=context.message.author
         if not isinstance(prefix, str):
             prefix = prefix[0]
         embed = discord.Embed(title="Help", description="List of available commands:", color=0x00FF00)
@@ -25,7 +26,10 @@ class Help(commands.Cog, name="help"):
             command_description = [command.help for command in commands]
             help_text = '\n'.join(f'{prefix}{n} - {h}' for n, h in zip(command_list, command_description))
             embed = discord.Embed(title=f"Commands in {i.capitalize()} Cog", description=f'```{help_text}```', color=0x00FF00)
-            await context.send(embed=embed)
+            await user.send(embed=embed)
+        if not isinstance(context.message.channel, discord.channel.DMChannel):
+            await context.send(f"DM sent to {user.mention}")
+            await context.message.delete()
 
 def setup(bot):
     bot.add_cog(Help(bot))

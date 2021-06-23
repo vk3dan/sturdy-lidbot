@@ -305,8 +305,10 @@ class general(commands.Cog, name="general"):
         """
         url = "https://www.reddit.com/r/catpics/random.json"
         # Async HTTP request
-        async with aiohttp.ClientSession() as session:
+        headers={'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:61.0) Gecko/20100101 Firefox/61.0'}
+        async with aiohttp.ClientSession(connector=aiohttp.TCPConnector(ssl=False),headers=headers) as session:
             raw_response = await session.get(url)
+            print(raw_response)
             response = await raw_response.text()
             response = json.loads(response)
             embed = discord.Embed(
@@ -431,6 +433,7 @@ class general(commands.Cog, name="general"):
         """
         user=context.message.author.id
         qthfile=f"resources/locations.json"
+        location=[]
         justincaseempty=open(qthfile,"a")
         justincaseempty.close
         with open(qthfile,"r") as qthjson:
@@ -443,11 +446,11 @@ class general(commands.Cog, name="general"):
             except:
                 pass
         if coords:
-            cleanargs=coords
+            cleanargs=f"{coords[0]}, {coords[1]}"
         else:
             cleanargs=re.sub(r'[^a-zA-Z0-9\,. -]','', args)
         location=await self.geocode(cleanargs)
-        if location==1:    
+        if "1" in location:
             embed = discord.Embed(
                     title=":warning: Weather error",
                     description=f"place {cleanargs} not found",
@@ -455,7 +458,7 @@ class general(commands.Cog, name="general"):
                 )
             await context.send(embed=embed)
             return 1
-        url = f"https://api.openweathermap.org/data/2.5/onecall?lat={location['geometry']['location']['lat']}&lon={location['geometry']['location']['lng']}&exclude=minutely,hourly&appid="+config.OPENWEATHER_API_KEY
+        url = f"https://api.openweathermap.org/data/2.5/onecall?lat={str(location['geometry']['location']['lat'])}&lon={str(location['geometry']['location']['lng'])}&exclude=minutely,hourly&appid="+config.OPENWEATHER_API_KEY
         print(url)
         # Async HTTP request
         async with aiohttp.ClientSession() as session:
@@ -984,8 +987,10 @@ class general(commands.Cog, name="general"):
         try:
             output = geo.geocode(location).raw
             print(f"Google geocode request for {output['formatted_address']}")
+            print(output)
         except:
-            return 1
+            output = {1:1}
+        print(output)
         return output
 
     async def howfar(self, startlat, startlon, finishlat, finishlon):
