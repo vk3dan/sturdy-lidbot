@@ -432,23 +432,24 @@ class general(commands.Cog, name="general"):
         Fetch the weather for the place requested.
         """
         user=context.message.author.id
-        qthfile=f"resources/locations.json"
         location=[]
-        justincaseempty=open(qthfile,"a")
-        justincaseempty.close
-        with open(qthfile,"r") as qthjson:
-            try:
-                data = json.loads(qthjson.read())
+        if len(args)==0:
+            qthfile=f"resources/locations.json"
+            justincaseempty=open(qthfile,"a")
+            justincaseempty.close
+            with open(qthfile,"r") as qthjson:
                 try:
-                    coords = data[f"{user}"]
+                    data = json.loads(qthjson.read())
+                    try:
+                        coords = data[f"{user}"]
+                    except:
+                        pass
                 except:
                     pass
-            except:
-                pass
-        if coords:
-            cleanargs=f"{coords[0]}, {coords[1]}"
+            if coords:
+                cleanargs=f"{coords[0]}, {coords[1]}"
         else:
-            cleanargs=re.sub(r'[^a-zA-Z0-9\,. -]','', args)
+            cleanargs=re.sub(r'[^a-zA-Z0-9\,\. -]','', str(args))
         location=await self.geocode(cleanargs)
         if "1" in location:
             embed = discord.Embed(
