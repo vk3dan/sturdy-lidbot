@@ -996,11 +996,20 @@ class general(commands.Cog, name="general"):
             sides=str(args[0])[1:]
         elif str(args[0]).isdecimal():
             sides=str(args[0])
-        sidesint=int(sides)
+        try:
+            sidesint=int(sides)
+        except:
+            embed = discord.Embed(
+                    title=":warning: Error",
+                    description="Error: I dunno what you did but this is... dice, it's not that hard to do this right lol.",
+                    color=0xFF0000
+            )
+            await context.send(embed=embed) 
+            return 1
         answer=random.randint(1,sidesint)
         if not isinstance(context.message.channel, discord.channel.DMChannel):
             webhook = await context.channel.create_webhook(name="lidstuff")
-            await webhook.send(f"I roll a {answer}", username=context.message.author.display_name, avatar_url=context.message.author.avatar_url)
+            await webhook.send(f"I rolled a {answer}", username=context.message.author.display_name, avatar_url=context.message.author.avatar_url)
             await webhook.delete()
         else:
             await context.send(f"You rolled a {answer}")
