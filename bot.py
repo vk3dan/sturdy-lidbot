@@ -13,10 +13,11 @@ This is a template to create your own discord bot in python.
 Version: 2.3
 """
 
-import discord, asyncio, os, platform, sys, random, requests
+import discord, asyncio, os, platform, sys, random, requests, json
 from discord.ext.commands import Bot
 from discord.ext import commands
 from discord import Webhook, RequestsWebhookAdapter
+from discord.utils import get
 if not os.path.isfile("config.py"):
 	sys.exit("'config.py' not found! Please add it and try again.")
 else:
@@ -124,10 +125,6 @@ async def on_message(message):
 				await message.add_reaction("🇴")
 				await message.add_reaction("🇳")
 				await message.add_reaction("🇰")
-			elif "south pole" in message.content.lower() and "penguin" in message.content.lower():
-				webhook = await message.channel.create_webhook(name="lidstuff")
-				await webhook.send("I thought we covered this, there are no goddamn penguins at the fucking south pole because there's a fucking desert, they're all on the coast.", username=config.PENGUIN_NAME)
-				await webhook.delete()
 			elif "penguin" in message.content.lower() or "🐧" in message.content:
 				webhook = await message.channel.create_webhook(name="lidstuff")
 				penguinquote, penguinnick = random.choice(list(penguins.items()))
@@ -143,6 +140,50 @@ async def on_message(message):
 				color=0xFF0000
 			)
 			await context.send(embed=embed)
+
+@bot.event
+async def on_raw_reaction_add(payload):
+	if payload.user_id == bot.user.id:
+		return
+	else:
+		if payload.user_id not in config.BLACKLIST:
+			# Process the command if the user is not blacklisted
+			if payload.emoji.name == "🐘":
+				guild=bot.get_guild(payload.guild_id)
+				channel=bot.get_channel(payload.channel_id)
+				msg = await channel.fetch_message(payload.message_id)
+				reaction = get(msg.reactions, emoji=payload.emoji.name)
+				if reaction and reaction.count > 1:
+					return
+				reactor=payload.member
+				name=msg.author.display_name
+				quote=msg.content
+				quotefile=f"resources/{payload.guild_id}quotes.json"
+				justincaseempty=open(quotefile,"a")
+				justincaseempty.close
+				with open(quotefile,"r") as quotejson:
+					try:
+						data = json.loads(quotejson.read())
+					except:
+						data={}
+				quotes={}
+				quotenum=len(data)+1
+				quotes[int(quotenum)]={
+            	    'name':name,
+                	'quote':quote
+				}
+				data.update(quotes)
+				data=json.dumps(data)
+				with open(quotefile,"w") as quotejson:
+					quotejson.write(data)
+				embed = discord.Embed(
+        		    title="Quote added",
+    		        description=f"Added quote {quotenum} - \"{name}: {quote}\" to quotes",
+    		        color=0x00FF00
+    		    )
+				webhook = await channel.create_webhook(name="lidstuff")
+				await webhook.send(embed=embed, username=reactor.display_name, avatar_url=reactor.avatar_url)
+				await webhook.delete()
 
 # The code in this event is executed every time a command has been *successfully* executed
 @bot.event

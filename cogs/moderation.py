@@ -5,7 +5,7 @@ class moderation(commands.Cog, name="moderation"):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command(name='kick', pass_context=True)
+    @commands.command(name='kick', pass_context=True, hidden=True)
     async def kick(self, context, member: discord.Member, *args):
         """
         Kick a user out of the server.
@@ -53,7 +53,7 @@ class moderation(commands.Cog, name="moderation"):
             )
             await context.send(embed=embed)
 
-    @commands.command(name="nick")
+    @commands.command(name="nick", hidden=True)
     async def nick(self, context, member: discord.Member, *, name: str):
         """
         Change the nickname of a user on a server.
@@ -84,7 +84,7 @@ class moderation(commands.Cog, name="moderation"):
             )
             await context.send(embed=embed)
 
-    @commands.command(name="ban")
+    @commands.command(name="ban", hidden=True)
     async def ban(self, context, member: discord.Member, *args):
         """
         Bans a user from the server.
@@ -127,7 +127,7 @@ class moderation(commands.Cog, name="moderation"):
             )
             await context.send(embed=embed)
 
-    @commands.command(name="warn")
+    @commands.command(name="warn", hidden=True)
     async def warn(self, context, member: discord.Member, *args):
         """
         Warns a user in his private messages.
@@ -156,7 +156,7 @@ class moderation(commands.Cog, name="moderation"):
             )
             await context.send(embed=embed)
 
-    @commands.command(name="purge")
+    @commands.command(name="purge", hidden=True)
     async def purge(self, context, number):
         """
         Delete a number of messages.

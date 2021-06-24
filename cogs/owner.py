@@ -9,7 +9,7 @@ class owner(commands.Cog, name="owner"):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command(name="shutdown")
+    @commands.command(name="shutdown", hidden=True)
     async def shutdown(self, context):
         """
         Make the bot shutdown
@@ -30,7 +30,7 @@ class owner(commands.Cog, name="owner"):
             )
             await context.send(embed=embed)
 
-    @commands.command(name="say", aliases=["echo"])
+    @commands.command(name="say", aliases=["echo"], hidden=True)
     async def say(self, context, *, args):
         """
         The bot will say anything you want.
@@ -45,7 +45,7 @@ class owner(commands.Cog, name="owner"):
             )
             await context.send(embed=embed)
 
-    @commands.command(name="embed")
+    @commands.command(name="embed", hidden=True)
     async def embed(self, context, *, args):
         """
         The bot will say anything you want, but within embeds.
@@ -64,7 +64,7 @@ class owner(commands.Cog, name="owner"):
             )
             await context.send(embed=embed)
 
-    @commands.group(name="blacklist")
+    @commands.group(name="blacklist", hidden=True)
     async def blacklist(self, context):
         """
         Lets you add or remove a user from not being able to use the bot.
@@ -77,7 +77,7 @@ class owner(commands.Cog, name="owner"):
             )
             await context.send(embed=embed)
 
-    @blacklist.command(name="add")
+    @blacklist.command(name="add", hidden=True)
     async def blacklist_add(self, context, member: discord.Member):
         """
         Lets you add a user from not being able to use the bot.
@@ -110,7 +110,7 @@ class owner(commands.Cog, name="owner"):
             )
             await context.send(embed=embed)
 
-    @blacklist.command(name="remove")
+    @blacklist.command(name="remove", hidden=True)
     async def blacklist_remove(self, context, member: discord.Member):
         """
         Lets you remove a user from not being able to use the bot.

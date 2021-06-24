@@ -1,4 +1,5 @@
 import os, sys, discord, platform, random, aiohttp, json, re, wolframalpha, subprocess, math, discord.ext, maidenhead
+from discord.ext.commands import context
 from discord.embeds import Embed
 from time import strftime
 from discord.ext import commands
@@ -973,6 +974,37 @@ class general(commands.Cog, name="general"):
         if not isinstance(context.message.channel, discord.channel.DMChannel):
             await context.send(f"DM sent to {user.mention}")
             await context.message.delete()
+
+    @commands.command(name="roll", aliases=["mobius", "flip", "coin", "d4", "d6", "d8", "d10", "d12", "d16", "d18", "d20"])
+    async def roll(self, context, *args):
+        if len(args)==0:
+            if context.invoked_with=="roll":
+                sides="6"
+            elif context.invoked_with.startswith("d"):
+                sides=context.invoked_with[1:]
+            elif context.invoked_with == "mobius":
+                sides="1"
+            elif context.invoked_with == "flip" or context.invoked_with == "coin":
+                answer=random.randint(1,2)
+                if answer==1:
+                    coinstate="HEADS"
+                else:
+                    coinstate="TAILS"
+                await context.send(f"The coin is showing {coinstate}")
+                return
+        elif args[0].lower().startswith("d"):
+            sides=str(args[0])[1:]
+        elif str(args[0]).isdecimal():
+            sides=str(args[0])
+        sidesint=int(sides)
+        answer=random.randint(1,sidesint)
+        if not isinstance(context.message.channel, discord.channel.DMChannel):
+            webhook = await context.channel.create_webhook(name="lidstuff")
+            await webhook.send(f"I roll a {answer}", username=context.message.author.display_name, avatar_url=context.message.author.avatar_url)
+            await webhook.delete()
+        else:
+            await context.send(f"You rolled a {answer}")
+
 
     async def convertcurrency(self, amount, fromcurrency, tocurrency):
         currencyurl=f"https://v6.exchangerate-api.com/v6/{config.EXCHANGERATE_API_KEY}/latest/{fromcurrency}"
