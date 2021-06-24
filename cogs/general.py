@@ -975,8 +975,9 @@ class general(commands.Cog, name="general"):
             await context.send(f"DM sent to {user.mention}")
             await context.message.delete()
 
-    @commands.command(name="roll", aliases=["mobius", "flip", "coin", "d4", "d6", "d8", "d10", "d12", "d16", "d18", "d20"])
+    @commands.command(name="roll", aliases=["mobius", "flip", "coin", "d4", "d6", "d8", "d10", "d12", "d16", "d18", "d20", "d24", "d100"])
     async def roll(self, context, *args):
+        rng = random.SystemRandom()
         if len(args)==0:
             if context.invoked_with=="roll":
                 sides="6"
@@ -985,14 +986,27 @@ class general(commands.Cog, name="general"):
             elif context.invoked_with == "mobius":
                 sides="1"
             elif context.invoked_with == "flip" or context.invoked_with == "coin":
-                answer=random.randint(1,2)
+                answer=rng.randint(1,2)
                 if answer==1:
                     coinstate="HEADS"
                 else:
                     coinstate="TAILS"
                 await context.send(f"The coin is showing {coinstate}")
                 return
-        elif args[0].lower().startswith("d"):
+        elif re.match("^[0-9]d[0-9]+",str(args[0]).lower()):
+            dies,sep,sides=str(args[0]).lower().partition("d")
+            results=[]
+            for x in range(int(dies)):
+                results.append(str(rng.randint(1,int(sides))))
+            results = ", ".join(results)
+            if not isinstance(context.message.channel, discord.channel.DMChannel):
+                webhook = await context.channel.create_webhook(name="lidstuff")
+                await webhook.send(f"I rolled {results}", username=context.message.author.display_name, avatar_url=context.message.author.avatar_url)
+                await webhook.delete()
+            else:
+                await context.send(f"You rolled {results}")
+            return
+        elif str(args[0]).lower().startswith("d"):
             sides=str(args[0])[1:]
         elif str(args[0]).isdecimal():
             sides=str(args[0])
@@ -1006,7 +1020,7 @@ class general(commands.Cog, name="general"):
             )
             await context.send(embed=embed) 
             return 1
-        answer=random.randint(1,sidesint)
+        answer=rng.randint(1,sidesint)
         if not isinstance(context.message.channel, discord.channel.DMChannel):
             webhook = await context.channel.create_webhook(name="lidstuff")
             await webhook.send(f"I rolled a {answer}", username=context.message.author.display_name, avatar_url=context.message.author.avatar_url)
