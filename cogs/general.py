@@ -993,7 +993,7 @@ class general(commands.Cog, name="general"):
                     coinstate="TAILS"
                 await context.send(f"The coin is showing {coinstate}")
                 return
-        elif re.match("^[0-9]d[0-9]+",str(args[0]).lower()):
+        elif re.match("^[1-9][0-9]?d[1-9][0-9][0-9]$",str(args[0]).lower()):
             dies,sep,sides=str(args[0]).lower().partition("d")
             results=[]
             for x in range(int(dies)):
@@ -1012,6 +1012,8 @@ class general(commands.Cog, name="general"):
             sides=str(args[0])
         try:
             sidesint=int(sides)
+            if sidesint > 999:
+                raise Exception("Too many sides")
         except:
             embed = discord.Embed(
                     title=":warning: Error",
