@@ -836,7 +836,6 @@ class general(commands.Cog, name="general"):
             webhook = await context.channel.create_webhook(name="lidstuff")
             await webhook.send(quote, username=f"{name} ({quotenum})", avatar_url="http://2.bp.blogspot.com/-xJg2euabxZo/UjDaFUUJmUI/AAAAAAAAAM0/y0ILnK5A0bg/s1600/quotes.png")
             await webhook.delete()
-            await context.message.delete()
 
     @commands.command(name="quotesearch", aliases=["searchquote", "findquote"])
     async def quotesearch(self, context, *, args=""):
@@ -993,7 +992,7 @@ class general(commands.Cog, name="general"):
                     coinstate="TAILS"
                 await context.send(f"The coin is showing {coinstate}")
                 return
-        elif re.match("^[1-9][0-9]?d[1-9][0-9][0-9]$",str(args[0]).lower()):
+        elif re.match("^[1-9][0-9]?d[1-9][0-9]?[0-9]?$",str(args[0]).lower()):
             dies,sep,sides=str(args[0]).lower().partition("d")
             results=[]
             for x in range(int(dies)):
@@ -1005,6 +1004,41 @@ class general(commands.Cog, name="general"):
                 await webhook.delete()
             else:
                 await context.send(f"You rolled {results}")
+            return
+        elif ("+" in ''.join(args)) or ("-" in ''.join(args)):
+            if "+" in ''.join(args):
+                sides,sep,change=''.join(args).lower().partition("+")
+            else:
+                sides,sep,change=''.join(args).lower().partition("-")
+            print (f"{sides} {sep} {change}")
+            try:
+                if sides.startswith("d"):
+                    sides=sides[1:]
+                sidesint=int(sides)
+                changeint=int(change)
+                if sidesint > 999:
+                    raise Exception("Too many sides")
+                if changeint > 100:
+                    raise Exception("Too much change")
+            except:
+                embed = discord.Embed(
+                    title=":warning: Error",
+                    description="Error: I dunno what you did but this is... dice, it's not that hard to do this right lol.",
+                    color=0xFF0000
+                )
+                await context.send(embed=embed) 
+                return 1
+            answer=rng.randint(1,sidesint)
+            if sep=="+":
+                finalanswer=answer + changeint
+            if sep=="-":
+                finalanswer=answer - changeint
+            if not isinstance(context.message.channel, discord.channel.DMChannel):
+                webhook = await context.channel.create_webhook(name="lidstuff")
+                await webhook.send(f"I rolled a {answer} ({sep}{changeint}) = {finalanswer}", username=context.message.author.display_name, avatar_url=context.message.author.avatar_url)
+                await webhook.delete()
+            else:
+                await context.send(f"You rolled a {answer} ({sep}{changeint}) = {finalanswer}")
             return
         elif str(args[0]).lower().startswith("d"):
             sides=str(args[0])[1:]
