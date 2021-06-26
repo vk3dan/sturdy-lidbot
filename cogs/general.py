@@ -974,7 +974,7 @@ class general(commands.Cog, name="general"):
             await context.send(f"DM sent to {user.mention}")
             await context.message.delete()
 
-    @commands.command(name="roll", aliases=["mobius", "flip", "coin", "d4", "d6", "d8", "d10", "d12", "d16", "d18", "d20", "d24", "d100"])
+    @commands.command(name="roll", aliases=["mobius", "flip", "coin", "d4", "d6", "d8", "d10", "d12", "d16", "d18", "d20", "d24", "d100", "privateroll", "proll"])
     async def roll(self, context, *args):
         rng = random.SystemRandom()
         if len(args)==0:
@@ -992,56 +992,65 @@ class general(commands.Cog, name="general"):
                     coinstate="TAILS"
                 await context.send(f"The coin is showing {coinstate}")
                 return
-        elif re.match("^[1-9][0-9]?d[1-9][0-9]?[0-9]?$",str(args[0]).lower()):
-            dies,sep,sides=str(args[0]).lower().partition("d")
-            results=[]
-            for x in range(int(dies)):
-                results.append(str(rng.randint(1,int(sides))))
-            results = ", ".join(results)
-            if not isinstance(context.message.channel, discord.channel.DMChannel):
-                webhook = await context.channel.create_webhook(name="lidstuff")
-                await webhook.send(f"I rolled {results}", username=context.message.author.display_name, avatar_url=context.message.author.avatar_url)
-                await webhook.delete()
+        elif re.match("^[1-9]?[0-9]?d[1-9][0-9]?[0-9]? ?([+-][0-9])?",''.join(args).lower()):
+            change="0"
+            op=""
+            dies="1"
+            if ("+" in ''.join(args)) or ("-" in ''.join(args)):
+                if "+" in ''.join(args):
+                    diesandsides,op,change=''.join(args).lower().partition("+")
+                    if not diesandsides.startswith("d"):
+                        dies,ded,sides=diesandsides.partition("d")
+                    else:
+                        sides=diesandsides[1:]
+                else:
+                    diesandsides,op,change=''.join(args).lower().partition("-")
+                    if not diesandsides.startswith("d"):
+                        dies,ded,sides=diesandsides.partition("d")
+                    else:
+                        sides=diesandsides[1:]
             else:
-                await context.send(f"You rolled {results}")
-            return
-        elif ("+" in ''.join(args)) or ("-" in ''.join(args)):
-            if "+" in ''.join(args):
-                sides,sep,change=''.join(args).lower().partition("+")
-            else:
-                sides,sep,change=''.join(args).lower().partition("-")
-            print (f"{sides} {sep} {change}")
-            try:
-                if sides.startswith("d"):
-                    sides=sides[1:]
-                sidesint=int(sides)
-                changeint=int(change)
-                if sidesint > 999:
-                    raise Exception("Too many sides")
-                if changeint > 100:
-                    raise Exception("Too much change")
-            except:
+                if not ''.join(args).startswith("d"):
+                    dies,ded,sides=''.join(args).lower().partition("d")
+                else:
+                    sides=''.join(args)[1:]
+            changeint=int(change)
+            sidesint=int(sides)
+            if sidesint > 999:
                 embed = discord.Embed(
                     title=":warning: Error",
-                    description="Error: I dunno what you did but this is... dice, it's not that hard to do this right lol.",
+                    description="Error: Too many sides.",
                     color=0xFF0000
                 )
                 await context.send(embed=embed) 
                 return 1
-            answer=rng.randint(1,sidesint)
-            if sep=="+":
-                finalanswer=answer + changeint
-            if sep=="-":
-                finalanswer=answer - changeint
-            if not isinstance(context.message.channel, discord.channel.DMChannel):
-                webhook = await context.channel.create_webhook(name="lidstuff")
-                await webhook.send(f"I rolled a {answer} ({sep}{changeint}) = {finalanswer}", username=context.message.author.display_name, avatar_url=context.message.author.avatar_url)
-                await webhook.delete()
+            results=[]
+            for x in range(int(dies)):
+                results.append(str(rng.randint(1,int(sides))))
+            resultsint = [int(s) for s in results]
+            resultstotal=sum(resultsint)
+            results = " + ".join(results)
+            if op != "" and change != "0":
+                if op=="+":
+                    resultstotal=resultstotal + changeint
+                if op=="-":
+                    resultstotal=resultstotal - changeint
+                results = f"{results} ({op}{change}) = {resultstotal}"
             else:
-                await context.send(f"You rolled a {answer} ({sep}{changeint}) = {finalanswer}")
+                if changeint == 0:
+                    results = f"{results} = {resultstotal}"
+            if not isinstance(context.message.channel, discord.channel.DMChannel):
+                if context.invoked_with=="privateroll" or context.invoked_with == "proll":
+                    user=context.message.author
+                    await user.send(f"You rolled {results}")
+                    await context.send(f"DM sent to {user.mention}")
+                else:
+                    webhook = await context.channel.create_webhook(name="lidstuff")
+                    await webhook.send(f"I rolled {results}", username=context.message.author.display_name, avatar_url=context.message.author.avatar_url)
+                    await webhook.delete()
+            else:
+                await context.send(f"You rolled {results}")
             return
-        elif str(args[0]).lower().startswith("d"):
-            sides=str(args[0])[1:]
         elif str(args[0]).isdecimal():
             sides=str(args[0])
         try:
