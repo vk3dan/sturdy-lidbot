@@ -703,7 +703,8 @@ class general(commands.Cog, name="general"):
     async def addquote(self, context, *args):
         """
         Add a quote (server specific)
-        Usage: !addquote MessageID
+        Usage: !addquote MessageID (Dev option in context menu)
+           Or: !addquote MessageURL (copy message link in context menu on message you want to quote)
            Or: !addquote <DisplayName> quotetext (Display Name must be inside '<' and '>' if there are spaces in the name otherwise optional)
         """
         if isinstance(context.message.channel, discord.channel.DMChannel):
@@ -976,6 +977,10 @@ class general(commands.Cog, name="general"):
 
     @commands.command(name="roll", aliases=["mobius", "flip", "coin", "d4", "d6", "d8", "d10", "d12", "d16", "d18", "d20", "d24", "d100", "privateroll", "proll"])
     async def roll(self, context, *args):
+        """
+        Usage: !roll <args>
+        Roll dice. or flip coins. examples: "!roll 4d6 +5" "!privateroll d20" "!coin" "!d6" etc.
+        """
         rng = random.SystemRandom()
         if len(args)==0:
             if context.invoked_with=="roll":
