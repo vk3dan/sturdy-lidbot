@@ -990,11 +990,13 @@ class general(commands.Cog, name="general"):
             elif context.invoked_with == "mobius":
                 sides="1"
             elif context.invoked_with == "flip" or context.invoked_with == "coin":
-                answer=rng.randint(1,2)
-                if answer==1:
+                answer=rng.randint(0,6000)
+                if answer<3000:
                     coinstate="HEADS"
-                else:
+                elif answer >3000:
                     coinstate="TAILS"
+                else:
+                    coinstate="EDGE.... it. landed. on. the. fucking. edge.\nTHAT CAN'T HAPPEN!"
                 await context.send(f"The coin is showing {coinstate}")
                 return
         elif re.match("^[1-9]?[0-9]?d[1-9][0-9]?[0-9]? ?([+-][0-9])?",''.join(args).lower()):
