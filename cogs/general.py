@@ -1074,11 +1074,16 @@ class general(commands.Cog, name="general"):
             return 1
         answer=rng.randint(1,sidesint)
         if not isinstance(context.message.channel, discord.channel.DMChannel):
-            webhook = await context.channel.create_webhook(name="lidstuff")
-            await webhook.send(f"I rolled a {answer}", username=context.message.author.display_name, avatar_url=context.message.author.avatar_url)
-            await webhook.delete()
+            if context.invoked_with=="privateroll" or context.invoked_with == "proll":
+                user=context.message.author
+                await user.send(f"You rolled {answer}")
+                await context.send(f"DM sent to {user.mention}")
+            else:
+                webhook = await context.channel.create_webhook(name="lidstuff")
+                await webhook.send(f"I rolled {answer}", username=context.message.author.display_name, avatar_url=context.message.author.avatar_url)
+                await webhook.delete()
         else:
-            await context.send(f"You rolled a {answer}")
+            await context.send(f"You rolled {answer}")
 
 
     async def convertcurrency(self, amount, fromcurrency, tocurrency):
