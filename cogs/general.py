@@ -1,4 +1,4 @@
-import os, sys, discord, platform, random, aiohttp, json, re, wolframalpha, subprocess, math, discord.ext, maidenhead
+import os, sys, discord, platform, random, aiohttp, json, re, wolframalpha, subprocess, math, discord.ext, maidenhead,urllib.parse
 from discord.ext.commands import context
 from discord.embeds import Embed
 from time import strftime
@@ -1098,7 +1098,10 @@ class general(commands.Cog, name="general"):
             response = json.loads(response)
             songname = response['items'][0]['recording']['title']
             artistname = response['items'][0]['recording']['artists'][0]['name']
-            albumcover = response['items'][0]['recording']['releases'][0]['artwork'][0]['url']
+            try:
+                albumcover = response['items'][0]['recording']['releases'][0]['artwork'][0]['url']
+            except:
+                albumcover = "https://www.abc.net.au/cm/rimage/8558756-1x1-large.jpg?v=4"
             embed = discord.Embed(
                 title="Currently playing on Triple J",
                 color=0x00FF00
@@ -1113,7 +1116,15 @@ class general(commands.Cog, name="general"):
                 value=songname,
                 inline=True
             )
-            embed.set_image(url=albumcover)
+            try:
+                embed.set_image(url=albumcover)
+            except:
+                pass
+            embed.add_field(
+                name="Search for this track on:",
+                value=f"[YouTube](https://www.youtube.com/results?search_query={urllib.parse.quote(artistname,safe='')}%20{urllib.parse.quote(songname,safe='')}) | [Spotify](https://play.spotify.com/search/{urllib.parse.quote(artistname,safe='')}%20{urllib.parse.quote(songname,safe='')})",
+                inline=False
+            )
             if not isinstance(context.message.channel, discord.channel.DMChannel):
                 webhook = await context.channel.create_webhook(name="lidstuff")
                 await webhook.send(embed=embed, username=context.message.author.display_name, avatar_url=context.message.author.avatar_url)
