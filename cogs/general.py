@@ -1085,6 +1085,42 @@ class general(commands.Cog, name="general"):
         else:
             await context.send(f"You rolled {answer}")
 
+    @commands.command(name="jjj", aliases=["triplej"])
+    async def jjj(self, context):
+        """
+        Usage: !jjj
+        Returns currently playing song on Triple J
+        """
+        url="http://music.abcradio.net.au/api/v1/plays/search.json?limit=1&station=triplej"
+        async with aiohttp.ClientSession() as session:
+            raw_response = await session.get(url)
+            response = await raw_response.text()
+            response = json.loads(response)
+            songname = response['items'][0]['recording']['title']
+            artistname = response['items'][0]['recording']['artists'][0]['name']
+            albumcover = response['items'][0]['recording']['releases'][0]['artwork'][0]['url']
+            embed = discord.Embed(
+                title="Currently playing on Triple J",
+                color=0x00FF00
+            )
+            embed.add_field(
+                name="Artist:",
+                value=artistname,
+                inline=True
+            )
+            embed.add_field(
+                name="Track:",
+                value=songname,
+                inline=True
+            )
+            embed.set_image(url=albumcover)
+            if not isinstance(context.message.channel, discord.channel.DMChannel):
+                webhook = await context.channel.create_webhook(name="lidstuff")
+                await webhook.send(embed=embed, username=context.message.author.display_name, avatar_url=context.message.author.avatar_url)
+                await webhook.delete()
+                await context.message.delete()
+            else:
+                await context.send(embed=embed)
 
     async def convertcurrency(self, amount, fromcurrency, tocurrency):
         currencyurl=f"https://v6.exchangerate-api.com/v6/{config.EXCHANGERATE_API_KEY}/latest/{fromcurrency}"
