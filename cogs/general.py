@@ -460,6 +460,14 @@ class general(commands.Cog, name="general"):
                 )
             await context.send(embed=embed)
             return 1
+        for each in location['address_components']:
+            if 'locality' in each['types']:
+                locality = each['long_name']
+            if 'administrative_area_level_1' in each['types']:
+                state = each['long_name']
+            if 'country' in each['types']:
+                country = each['long_name']
+        outputlocation= f"{locality}, {state}, {country}"
         url = f"https://api.openweathermap.org/data/2.5/onecall?lat={str(location['geometry']['location']['lat'])}&lon={str(location['geometry']['location']['lng'])}&exclude=minutely,hourly&appid="+config.OPENWEATHER_API_KEY
         print(url)
         # Async HTTP request
@@ -499,7 +507,7 @@ class general(commands.Cog, name="general"):
                 )
             else:
                 embed = discord.Embed(
-                    title=f":sun_with_face: Weather for {location['formatted_address']}",
+                    title=f":sun_with_face: Weather for {outputlocation}",
                     description=f"**Current Conditions:** {response['current']['weather'][0]['description'].capitalize()}",
                     color=0x00FF00
                 )
