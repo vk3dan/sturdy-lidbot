@@ -23,6 +23,8 @@ EXCHANGERATE_API_KEY = "YOUR_API_KEY_HERE"
 #QRZ_PASSWORD = "YOUR_QRZ_PASSWORD"
 GOOGLEGEO_API_KEY = "YOUR_API_KEY_HERE"
 WEBHOOK_URL = "https://webhookurl.here/"
+APRS_FI_API_KEY = "YOUR_API_KEY_HERE"
+APRS_FI_HTTP_AGENT = "lidbot/current (+https://github.com/vk3dan/sturdy-lidbot)"
 BLACKLIST = []
  # Default cogs that I use in the bot at the moment
 STARTUP_COGS = [
