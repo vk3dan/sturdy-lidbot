@@ -1,7 +1,11 @@
 import os, sys, discord, platform, random, aiohttp, json, re, xmltodict, time, csv, wget, subprocess, xml.etree.ElementTree, math
+from time import strftime
+from datetime import datetime
 from discord import embeds
 from discord.ext import commands
+from geopy.geocoders import GoogleV3
 from geopy.distance import geodesic
+from dateutil import tz
 import urllib.parse
 if not os.path.isfile("config.py"):
     sys.exit("'config.py' not found! Please add it and try again.")
@@ -467,6 +471,149 @@ class ham(commands.Cog, name="ham"):
             await context.message.delete()
         else:
             await context.send(embed=embed)
+
+    @commands.command(name="aprs", aliases=["aprs.fi"])
+    async def aprs(self, context, *, args):
+        """
+        Usage: !aprs <callsign-SSID>
+        Fetch latest APRS data for callsign-SSID from aprs.fi
+        eg: !aprs VK3DAN-9
+        """
+        if len(args)==0:
+            embed=discord.Embed(
+                title=f":warning: Error:",
+                description=f"No arguments:\nUsage: !aprs <callsign-SSID>",
+                color=0xFF0000
+            )
+            await context.send(embed=embed)
+            return 1
+        cleanargs=re.sub(r'[^a-zA-Z0-9\-]','', args)
+        url = f"https://api.aprs.fi/api/get?name={cleanargs}&what=loc&apikey={config.APRS_FI_API_KEY}&format=json"
+        # Async HTTP request
+        headers={'User-Agent': config.APRS_FI_HTTP_AGENT}
+        async with aiohttp.ClientSession(connector=aiohttp.TCPConnector(ssl=True),headers=headers) as session:
+            raw_response = await session.get(url)
+            response = await raw_response.text()
+            print (response)
+            response = json.loads(response)
+            if response['result']=="fail":
+                embed=discord.Embed(
+                    title=f":warning: APRS.fi error:",
+                    description=f"request failed",
+                    color=0xFF0000
+                )
+                await context.send(embed=embed)
+                return 1
+            if response['found']==0:
+                embed=discord.Embed(
+                    title=f":warning: APRS.fi error:",
+                    description=f"No entries found matching request",
+                    color=0xFF0000
+                )
+                await context.send(embed=embed)
+                return 1
+            try:
+                embed = discord.Embed(
+                    title=f"APRS.fi data for {response['entries'][0]['srccall']}:",
+                    color=0x00FF00
+                )
+                embed.add_field(
+                    name="Callsign",
+                    value=response['entries'][0]['srccall'],
+                    inline=True
+                )
+                if response['entries'][0]['type']=="l":
+                    type="APRS station"
+                elif response['entries'][0]['type']=="a":
+                    type="AIS"
+                elif response['entries'][0]['type']=="i":
+                    type="APRS item"
+                elif response['entries'][0]['type']=="o":
+                    type="APRS object"
+                elif response['entries'][0]['type']=="w":
+                    type="Weather station"
+                else:
+                    type="Unknown"
+                embed.add_field(
+                    name="Type:",
+                    value=type,
+                    inline=True
+                )
+                try:
+                    time = int(response['entries'][0]['time'])
+                    time = datetime.fromtimestamp(time, tz.UTC)
+                    time = time.strftime("%Y-%m-%d %H:%M:%S UTC")
+                    embed.add_field(
+                        name="Time:",
+                        value=time,            
+                        inline=True
+                    )
+                except:
+                    pass
+                location=await self.geocode(f"{response['entries'][0]['lat']}, {response['entries'][0]['lng']}")
+                for each in location['address_components']:
+                    if 'locality' in each['types']:
+                        locality = each['long_name']
+                    if 'administrative_area_level_1' in each['types']:
+                        state = each['long_name']
+                    if 'country' in each['types']:
+                        country = each['long_name']
+                outputlocation= f"{locality}, {state}, {country}"
+                embed.add_field(
+                    name="Location:",
+                    value=f"{outputlocation}\n{response['entries'][0]['lat']}, {response['entries'][0]['lng']}",
+                    inline=True
+                )
+                try:
+                    embed.add_field(
+                        name="Altitude:",
+                        value=f"{response['entries'][0]['altitude']} meters",
+                        inline=True
+                    )
+                except:
+                    pass
+                try:
+                    direction=await self.direction_from_degrees(int(response['entries'][0]['course']))
+                    speed=round(float(response['entries'][0]['speed']),1)
+                    speedmph=round(float(response['entries'][0]['speed'])*0.62137119223733,1)
+                    embed.add_field(
+                        name="Heading:",
+                        value=f"{response['entries'][0]['course']}° ({direction})\n{speed} km/h *({speedmph} mph)*",
+                        inline=True
+                    )
+                except:
+                    pass
+                try:
+                    embed.add_field(
+                        name="Comment:",
+                        value=response['entries'][0]['comment'],
+                        inline=True
+                    )
+                except:
+                    pass
+                embed.add_field(
+                    name="Path:",
+                    value=response['entries'][0]['path'],
+                    inline=True
+                )
+            except:
+                embed=discord.Embed(
+                    title=f":warning: APRS.fi error:",
+                    description=f"JSON read failed",
+                    color=0xFF0000
+                )
+                await context.send(embed=embed)
+                return 1
+            await context.send(embed=embed)
+
+    async def geocode(self, location):
+        geo = GoogleV3(api_key=config.GOOGLEGEO_API_KEY, user_agent="lidbot")
+        try:
+            output = geo.geocode(location).raw
+            print(f"Google geocode request for {output['formatted_address']}")
+        except:
+            output = {1:1}
+        return output
 
     async def howfar(self, startlat, startlon, finishlat, finishlon):
         startloc=(float(startlat),float(startlon))
