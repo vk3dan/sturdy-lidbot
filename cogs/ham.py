@@ -565,17 +565,19 @@ class ham(commands.Cog, name="ham"):
                     inline=True
                 )
                 try:
+                    alt=round(float(response['entries'][0]['altitude']))
+                    altft=round(alt*3.28084)
                     embed.add_field(
                         name="Altitude:",
-                        value=f"{response['entries'][0]['altitude']} meters",
+                        value=f"{alt} m *({altft} ft)*",
                         inline=True
                     )
                 except:
                     pass
                 try:
                     direction=await self.direction_from_degrees(int(response['entries'][0]['course']))
-                    speed=round(float(response['entries'][0]['speed']),1)
-                    speedmph=round(float(response['entries'][0]['speed'])*0.62137119223733,1)
+                    speed=round(float(response['entries'][0]['speed']))
+                    speedmph=round(speed*0.62137119223733)
                     embed.add_field(
                         name="Heading:",
                         value=f"{response['entries'][0]['course']}° ({direction})\n{speed} km/h *({speedmph} mph)*",
