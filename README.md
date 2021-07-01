@@ -10,6 +10,8 @@ pictures, flipping text, a quote system and a couple of ham radio related comman
 
 lidbot uses some code from **[@molo1134's qrmbot](https://github.com/molo1134/qrmbot)** irc bot in the qrz command. this portion of the code is under the BSD 2-clause license, a copy of which is located in qrmbot.LICENSE.md. My bot in general draws heavy inspiration from his amazing bot project.
 
+lidbot uses APRS (Amateur Packet Reporting System) data from **[aprs.fi](https://aprs.fi)'s** API
+
 ## Commands
 
 #### Commands in General Cog
