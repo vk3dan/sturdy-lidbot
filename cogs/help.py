@@ -22,8 +22,8 @@ class Help(commands.Cog, name="help"):
         for i in self.bot.cogs:
             cog = self.bot.get_cog(i.lower())
             commands = cog.get_commands()
-            command_list = [command.name for command in commands]
-            command_description = [command.help for command in commands]
+            command_list = [command.name for command in commands if not command.hidden or context.message.author.id in config.OWNERS]
+            command_description = [command.help for command in commands if not command.hidden or context.message.author.id in config.OWNERS]
             help_text = '\n'.join(f'{prefix}{n} - {h}' for n, h in zip(command_list, command_description))
             embed = discord.Embed(title=f"Commands in {i.capitalize()} Cog", description=f'```{help_text}```', color=0x00FF00)
             await user.send(embed=embed)

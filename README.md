@@ -42,13 +42,23 @@ Reverse text.
 !missyelliot - Usage: !missyelliot <input text>
 Put your thang down, flip it and reverse it.
 !addquote - Add a quote (server specific)
-Usage: !addquote MessageID
+Usage: !addquote MessageID (Dev option in context menu)
+   Or: !addquote MessageURL (copy message link in context menu on message you want to quote)
    Or: !addquote <DisplayName> quotetext (Display Name must be inside '<' and '>' if there are spaces in the name otherwise optional)
 !quote - Display a quote (server specific)
 Usage: !quote
    Or: !quote <quotenumber>
 !quotesearch - Find a quote (server specific). Returns quotes via DM
 Usage: !quotesearch <keyword>
+!setgeo - Usage: !setgeo <location>
+Set your location. location can be text (eg: "Melbourne vic"), decimal coords (eg: "-37.8136,144.9631", or grid square.)
+This will mean you don't need to input your location when using !wx unless you want a different location.
+!getgeo - Usage: !getgeo <location>
+Check your saved location. this will be sent to you as a DM
+!roll - Usage: !roll <args>
+Roll dice. or flip coins. examples: "!roll 4d6 +5" "!privateroll d20" "!coin" "!d6" etc.
+!jjj - Usage: !jjj
+Returns currently playing song on Triple J
 ```
 #### Commands in Help Cog
 ```
@@ -72,6 +82,9 @@ Convert morse code input to text.
 !qrz - Usage: !qrz <callsign> - Lookup callsign on qrz.com
 !dxcc - Usage: !dxcc <prefix/callsign/dxccnumber> - Lookup dxcc from
 number, callsign or prefix
+!aprs - Usage: !aprs <callsign-SSID>
+Fetch latest APRS data for callsign-SSID from aprs.fi
+eg: !aprs VK3DAN-9
 ```
 
 ## Authors
