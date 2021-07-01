@@ -8,7 +8,7 @@ bot template.
 It has had some features added sofar such as dogecoin price, random cat
 pictures, flipping text, a quote system and a couple of ham radio related commands.
 
-lidbot uses some code from **[@molo1134's qrmbot](https://github.com/molo1134/qrmbot)** irc bot in the qrz command. this portion of the code is under the BSD 2-clause license, a copy of which is located in qrmbot.LICENSE.md. My bot in general draws heavy inspiration from his amazing bot project.
+lidbot uses some code and the list of known reddit hams from **[@molo1134's qrmbot](https://github.com/molo1134/qrmbot)** irc bot in the qrz command. this portion of the code is under the BSD 2-clause license, a copy of which is located in qrmbot.LICENSE.md. My bot in general draws heavy inspiration from his amazing bot project.
 
 lidbot uses APRS (Amateur Packet Reporting System) data from **[aprs.fi](https://aprs.fi)'s** API
 
@@ -105,7 +105,7 @@ https://discordapp.com/oauth2/authorize?&client_id=YOUR_APPLICATION_ID_HERE&scop
 
 ## How to setup
 
-To setup the bot Krypton made it as simple as possible. he created a [config.py](config.py) file where you can put the needed things to edit.
+To setup the bot there is a [config.py](config.py) file where you can put the needed things.
 
 Here is an explanation of what everything is:
 
@@ -150,4 +150,4 @@ python bot.py
 
 ## License
 
-This project is licensed under the Apache License 2.0 - see the [LICENSE.md](LICENSE.md) file for details
+This project is licensed under the Apache License 2.0 (except for the qrz portion of qrmbot that is mentioned above) - see the [LICENSE.md](LICENSE.md) file for details
