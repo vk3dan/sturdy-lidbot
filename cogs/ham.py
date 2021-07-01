@@ -473,13 +473,13 @@ class ham(commands.Cog, name="ham"):
             await context.send(embed=embed)
 
     @commands.command(name="aprs", aliases=["aprs.fi"])
-    async def aprs(self, context, *, args):
+    async def aprs(self, context, *, args=None):
         """
         Usage: !aprs <callsign-SSID>
         Fetch latest APRS data for callsign-SSID from aprs.fi
         eg: !aprs VK3DAN-9
         """
-        if len(args)==0:
+        if args==None:
             embed=discord.Embed(
                 title=f":warning: Error:",
                 description=f"No arguments:\nUsage: !aprs <callsign-SSID>",
@@ -606,7 +606,14 @@ class ham(commands.Cog, name="ham"):
                 )
                 await context.send(embed=embed)
                 return 1
-            await context.send(embed=embed)
+            if not isinstance(context.message.channel, discord.channel.DMChannel):
+                webhook = await context.channel.create_webhook(name="lidstuff")
+                await webhook.send(embed=embed, username=context.message.author.display_name, avatar_url=context.message.author.avatar_url)
+                await webhook.delete()
+                await context.message.delete()
+            else:
+                await context.send(embed=embed)
+
 
     async def geocode(self, location):
         geo = GoogleV3(api_key=config.GOOGLEGEO_API_KEY, user_agent="lidbot")
