@@ -28,5 +28,5 @@ APRS_FI_HTTP_AGENT = "lidbot/current (+https://github.com/vk3dan/sturdy-lidbot)"
 BLACKLIST = []
  # Default cogs that I use in the bot at the moment
 STARTUP_COGS = [
-    "cogs.general", "cogs.help", "cogs.owner", "cogs.ham",
+    "cogs.general", "cogs.help", "cogs.owner", "cogs.ham", "cogs.gonkphone"
 ]
