@@ -1,11 +1,5 @@
-import os, sys, discord, wget, re, csv, time
+import os, discord, wget, re, csv
 from discord.ext import commands
-
-# Only if you want to use variables that are in the config.py file.
-if not os.path.isfile("config.py"):
-    sys.exit("'config.py' not found! Please add it and try again.")
-else:
-    import config
 
 # Here we name the cog and create a new class for the cog.
 class gonkphone(commands.Cog, name="gonkphone"):
