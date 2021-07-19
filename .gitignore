@@ -140,3 +140,4 @@ cython_debug/
 .idea/*
 lidbot.code-workspace
 lidbot.service
+.DS_Store
