@@ -56,7 +56,15 @@ intents.members = True
 intents = discord.Intents.default()
 intents.members = True
 
-bot = Bot(command_prefix=config.BOT_PREFIX, intents=intents, case_insensitive=True)
+prefixes = [config.BOT_PREFIX,'?']
+ser_pref={'845344210231623690':['?']}
+def get_prefix(bot, msg):
+    if msg.guild.id in ser_pref:
+        return commands.when_mentioned_or(*ser_pref['845344210231623690'])
+
+    return commands.when_mentioned_or(*prefixes)(bot, msg)
+
+bot = Bot(command_prefix=get_prefix, intents=intents, case_insensitive=True)
 
 statuses = ['like a lid', 'with a baofeng', 'with myself', 'with my ding-ding',
     'you.', 'myself', 'with fireworks in garage', 'with matches', 'guitar', 'sportsball',
