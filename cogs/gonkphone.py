@@ -137,7 +137,7 @@ class gonkphone(commands.Cog, name="gonkphone"):
                 color=0xFF0000
             )
         if not isinstance(context.message.channel, discord.channel.DMChannel):
-            avatarfile = open("resources/gonk.png", "rb")
+            avatarfile = open("images/gonk.png", "rb")
             avatar = avatarfile.read()
             webhook = await context.channel.create_webhook(name="lidstuff")
             await webhook.edit(avatar=avatar)
