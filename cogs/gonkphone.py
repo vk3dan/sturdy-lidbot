@@ -14,6 +14,10 @@ class gonkphone(commands.Cog, name="gonkphone"):
 
     @commands.command(name="phonebook", aliases=["directory","gonkphone","gonkline"])
     async def phonebook(self, context, *, args=""):
+        """
+        Usage: !phonebook <query>
+        Look up a GONK subscriber's gonknumber by number, name, callsign, or partial name/callsign. (If called without a query it will DM you the full list)
+        """
         cleanargs=re.sub(r'[^a-zA-Z0-9]','', args)
         directoryurl = "https://docs.google.com/spreadsheets/d/1_2hc2sx31cFrpSXxE0SWSOc6-OD2sRHBHztcuRFdVoE/export?format=csv"
         directoryfile = "resources/GONKDirectory.csv"

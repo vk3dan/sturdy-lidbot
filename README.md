@@ -53,7 +53,7 @@ Usage: !quote
 !quotesearch - Find a quote (server specific). Returns quotes via DM
 Usage: !quotesearch <keyword>
 !setgeo - Usage: !setgeo <location>
-Set your location. location can be text (eg: "Melbourne vic"), decimal coords (eg: "-37.8136,144.9631", or grid square.)
+Set your location. location can be text (eg: "Melbourne vic"), decimal coords (eg: "-37.8136,144.9631", or grid square (eg: "QF22qf").)
 This will mean you don't need to input your location when using !wx unless you want a different location.
 !getgeo - Usage: !getgeo <location>
 Check your saved location. this will be sent to you as a DM
@@ -88,65 +88,15 @@ number, callsign or prefix
 Fetch latest APRS data for callsign-SSID from aprs.fi
 eg: !aprs VK3DAN-9
 ```
+#### Commands in Gonkphone Cog
+```
+!phonebook - Usage: !phonebook <query>
+Look up a GONK subscriber's gonknumber by number, name, callsign, or partial name/callsign. (If called without a query it will DM you the full list)
+```
 
 ## Authors
 * **[vk3dan](https://github.com/vk3dan)** - That's me
-* **[Krypton (@kkrypt0nn)](https://github.com/kkrypt0nn)** - Author of the
-  template used
-
-To use this you can do the following:
-* Clone/Download the repository
-    * To clone it and get the updates you can definitely use the command
-    `git clone`
-* Create a discord bot [here](https://discord.com/developers/applications)
-* Get your bot token
-* Invite your bot on servers using the following invite:
-https://discordapp.com/oauth2/authorize?&client_id=YOUR_APPLICATION_ID_HERE&scope=bot&permissions=8 (Replace `YOUR_APPLICATION_ID_HERE` with the application ID)
-
-## How to setup
-
-To setup the bot there is a [config.py](config.py) file where you can put the needed things.
-
-Here is an explanation of what everything is:
-
-| Variable          | What it is                                                            |
-| ------------------| ----------------------------------------------------------------------|
-| BOT_PREFIX        | The prefix(es) of your bot                                            |
-| TOKEN             | The token of your bot                                                 |
-| APPLICATION_ID    | The application ID of your bot                                        |
-| OWNERS            | The user ID of all the bot owners                                     |
-| BLACKLIST         | The user ID of all the users who can't use the bot                    |
-| STARTUP_COGS      | The cogs that should be automatically loaded when you start the bot   |
-
-Then there are various API keys that I have added for other features.
-
-## How to start
-
-To start the bot you simply need to launch, either your terminal (Linux, Mac & Windows) or your Command Prompt (Windows).
-
-Before running the bot you will need to install all the requirements with this command:
-```
-pip install -r requirements.txt
-```
-
-If you have multiple versions of python installed (2.x and 3.x) then you will need to use the following command:
-```
-python3 bot.py
-```
-or eventually
-```
-python3.8 bot.py
-```
-<br>
-
-If you have just installed python today, then you just need to use the following command:
-```
-python bot.py
-```
-
-## Built With
-
-* [Python 3.8](https://www.python.org/)
+* **[Krypton (@kkrypt0nn)](https://github.com/kkrypt0nn)** - Author of the template used
 
 ## License
 

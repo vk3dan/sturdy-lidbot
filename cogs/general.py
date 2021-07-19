@@ -902,7 +902,7 @@ class general(commands.Cog, name="general"):
     async def setgeo(self, context, *args):
         """
         Usage: !setgeo <location>
-        Set your location. location can be text (eg: "Melbourne vic"), decimal coords (eg: "-37.8136,144.9631", or grid square.)
+        Set your location. location can be text (eg: "Melbourne vic"), decimal coords (eg: "-37.8136,144.9631", or grid square (eg: "QF22qf").)
         This will mean you don't need to input your location when using !wx unless you want a different location.
         """
         if len(args)==0:
