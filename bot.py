@@ -56,13 +56,12 @@ intents.members = True
 intents = discord.Intents.default()
 intents.members = True
 
-prefixes = [config.BOT_PREFIX,'?']
-ser_pref={'845344210231623690':['?']}
-def get_prefix(bot, msg):
-    if msg.guild.id in ser_pref:
-        return commands.when_mentioned_or(*ser_pref['845344210231623690'])
-
-    return commands.when_mentioned_or(*prefixes)(bot, msg)
+ser_pref={'845344210231623690':'?','821167263566528562':'.'}
+def get_prefix(bot, msg):	
+	if str(msg.guild.id) in ser_pref:
+		return ser_pref[str(msg.guild.id)]
+	else:
+	    return config.BOT_PREFIX
 
 bot = Bot(command_prefix=get_prefix, intents=intents, case_insensitive=True)
 
