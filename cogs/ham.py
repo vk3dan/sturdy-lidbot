@@ -253,7 +253,7 @@ class ham(commands.Cog, name="ham"):
 #            url = f"https://xmldata.qrz.com/xml/current/?s={sessionkey};callsign={cleanargs.upper()}"
 #            raw_response = await session.get(url)
 #            response = await raw_response.text()
-        response=subprocess.check_output(f"qrz --xml {callsign}",shell=True)
+        response=subprocess.check_output(f"./qrmbot/qrz --xml {callsign}",shell=True)
         response=xmltodict.parse(response)
         print(response)
         if redditor==1:
@@ -634,6 +634,91 @@ class ham(commands.Cog, name="ham"):
                 await context.message.delete()
             else:
                 await context.send(embed=embed)
+
+    @commands.command(name="ae7q", aliases=["available"])
+    async def dxcc(self, context, *, args):
+        """
+            Usage: !ae7q <regionnumber>
+               or: !ae7q <callsign>
+            Looks up on ae7q available callsigns for region or call info. (USA only)
+        """
+        cleanargs=re.sub(r'[^A-Za-z0-9]+','', args)
+        response=subprocess.check_output(f"./qrmbot/ae7q {cleanargs}",shell=True)
+        response=response.decode('utf-8')
+        print (response)
+        if response.startswith("Region"):
+            splitresponse=response.split(';')
+            availsplit=splitresponse[0].split(':')
+            region=availsplit[0]
+            if len(availsplit)==3:
+                availcalls=availsplit[2]
+            else:
+                availcalls="None"
+            pendingsplit=splitresponse[1].split(':')
+            if len(pendingsplit)==2:
+                pendingcalls=pendingsplit[1]
+            else:
+                pendingcalls="None"
+            upcomingsplit=splitresponse[2].split(':')
+            if len(upcomingsplit)==2:
+                upcomingcalls=upcomingsplit[1]
+            else:
+                upcomingcalls="None"
+            if len(splitresponse)==4:
+                unavailablesplit=splitresponse[3].split(':')
+                if len(unavailablesplit)==2:
+                    unavailablecalls=unavailablesplit[1]
+                else:
+                    unavailablecalls="None"
+            embed=discord.Embed(
+                title=f"AE7Q Lookup: {region}",
+                color=0x00FF00
+            )
+            embed.add_field(
+                name=f"Available ({int(''.join(filter(str.isdigit, availsplit[1])))}):",
+                value=availcalls,
+                inline=True
+            )
+            embed.add_field(
+                name=f"Pending ({int(''.join(filter(str.isdigit, pendingsplit[0])))}):",
+                value=pendingcalls,
+                inline=True
+            )
+            embed.add_field(
+                name=f"Upcoming ({int(''.join(filter(str.isdigit, upcomingsplit[0])))}):",
+                value=upcomingcalls,
+                inline=True
+            )
+            if len(splitresponse)==4:
+                embed.add_field(
+                    name=f"Unavailable ({int(''.join(filter(str.isdigit, unavailablesplit[0])))}):",
+                    value=unavailablecalls,
+                    inline=True
+                )
+            if not isinstance(context.message.channel, discord.channel.DMChannel):
+                webhook = await context.channel.create_webhook(name="lidstuff")
+                await webhook.send(embed=embed, username=context.message.author.display_name, avatar_url=context.message.author.avatar_url)
+                await webhook.delete()
+                await context.message.delete()
+            else:
+                await context.send(embed=embed)
+        else:
+            try:
+                if not isinstance(context.message.channel, discord.channel.DMChannel):
+                    webhook = await context.channel.create_webhook(name="lidstuff")
+                    await webhook.send(f"```{response}```", username=context.message.author.display_name, avatar_url=context.message.author.avatar_url)
+                    await webhook.delete()
+                    await context.message.delete()
+                else:
+                    await context.send(embed=embed)
+            except:
+                embed=discord.Embed(
+                    title=f":warning: AE7Q error:",
+                    description=f"Lookup failed. Please check input.",
+                    color=0xFF0000
+                )
+                await context.send(embed=embed)
+                return 1
 
 
     async def geocode(self, location):

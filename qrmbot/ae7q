@@ -1,0 +1,525 @@
+#!/usr/bin/perl -w
+#
+# Scrape info from ae7q.com
+#
+# 2-clause BSD license.
+# Copyright (c) 2019, 2020, 2021 molo1134@github. All rights reserved.
+
+use strict;
+use utf8;
+use feature 'unicode_strings';
+binmode(STDOUT, ":utf8");
+
+
+use File::Basename;
+use Cwd 'realpath';
+use lib dirname(realpath(__FILE__));
+#use Colors;
+use Util;
+
+use Time::Local;
+use Time::Piece ();
+use List::Util qw[min max];
+use POSIX qw(strftime);
+
+# disable "experimental" warning on smart match operator use
+no if $] >= 5.018, warnings => "experimental::smartmatch";
+
+my $username = $ENV{'USER'} || $ENV{'USERNAME'} || getpwuid($<);
+my $highlight="vt220";
+$highlight = "none" if ! -t STDOUT;
+$highlight = "irc" if $username eq "eggdrop";
+
+my $predictionBaseUrl = "http://34.121.48.146:8018/predict/";
+
+# change this to 0 to always exit with success
+our $exitnonzeroonerror = 1;
+$exitnonzeroonerror = 0 if $username eq 'eggdrop';
+
+# eggdrop doesn't split args on spaces
+@ARGV=split(' ', join(' ',@ARGV));
+@ARGV = uniq(@ARGV);	# deduplicate - no reason to process the same url twice
+
+if ($#ARGV < 0 || length($ARGV[0]) == 0) {
+  if ($username eq 'eggdrop') {
+    print "usage: !ae7q <call>|<region>\n";
+  } else {
+    print "usage: $0 <call>|<region>\n";
+  }
+  exit $exitnonzeroonerror;
+}
+
+my $ae7qTimeout = 16;
+my $i = 0;
+while ($i <= $#ARGV) {
+
+  $ARGV[$i] =~ s/'//g; # sanitize
+
+  if ($ARGV[$i] =~ m/^[0-9]+$/) {
+    doAe7qRegion($ARGV[$i]);
+  } else {
+    doAe7qCall($ARGV[$i]);
+  }
+  $i++;
+}
+
+sub doAe7qRegion {
+  my $region = shift;
+  my $saved = $_;
+  $region = 10 if $region == 0;
+  my $url = "http://www.ae7q.com/query/list/GenLicAvail.php?REGION=$region";
+
+  my @avail;
+  my @pending;
+  my @upcoming;
+  my @unavail;
+  my $lastcall;
+  my $inCallTable = 0;
+  open(HTTP, '-|', "curl --max-time $ae7qTimeout -L -k -s '$url'");
+  while(<HTTP>) {
+    $inCallTable = 1 if (m|>\s*[12]x[12] callsigns\s*<|);
+    if (not defined $lastcall and $inCallTable and m|<a href='/query/data/CallHistory\.php\?CALL=([A-Z0-9]+)'|) {
+      $lastcall = $1;
+      #print "lastcall: $lastcall\n";
+    }
+    if (defined $lastcall and m|</td><td class='DatabaseField' align='center'>\d+</td><td class="Database" style='background-color:#([0-9A-F]+);.*?center'>([0-9-]+).*?center'>([0-9-]*)|) {
+      my $color = $1;
+      my $date = $2;
+      my $avdate = $3;
+      #print "$lastcall: color: $color date: $date $avdate\n" if $avdate eq "";
+      if ($color eq "99CCFF") { # blue
+	push @pending, $lastcall;
+	#print "pending: $lastcall\n";
+      } elsif ($color eq "99FF66") { # green
+	push @avail, $lastcall;
+	#print "avail $lastcall\n";
+      } elsif ($avdate ne "") {
+	if ($color eq "FFFF66" or $color eq "FF99CC") { # yellow, red
+	  my $datestamp = Time::Piece->strptime($avdate, "%Y-%m-%d")->epoch;
+	  if ($datestamp < time()) {
+	    push (@avail, $lastcall);
+	  } elsif ($datestamp < (time() + (7 * 24*60*60))) {
+	    push (@upcoming, $lastcall);
+	  }
+	}
+      } else {
+	my ($y, $m, $d) = split /-/, $date;
+
+	# increment 2 years
+	$y += 2;
+
+	# increment 1 day
+	$d += 1;
+	if ($d > getDaysInMonth($m, $y)) {
+	  $m++;
+	  $d = 1;
+	}
+	if ($m > 12) {
+	  $m = 1;
+	  $y++;
+	}
+
+	$avdate = sprintf "%04u-%02u-%02u", $y, $m, $d;
+	my $today = strftime ("%Y-%m-%d", localtime(time()));
+	#print "$lastcall $avdate $today\n";
+
+	if ($today eq $avdate) {
+	  push @avail, $lastcall;
+	} else {
+	  push @unavail, $lastcall;
+	}
+      }
+      $lastcall = undef;
+    }
+
+  }
+  close(HTTP);
+
+  my %regionPreds;
+  my @callsToCheck;
+  push (@callsToCheck, @pending);
+  push (@callsToCheck, @avail);
+  foreach my $c (@callsToCheck) {
+    my $url = "${predictionBaseUrl}/vanity-$c.csv";
+    my $sum = 0.0;
+    my @seenApps;
+    open(CSV, '-|', "curl --fail --max-time $ae7qTimeout -L -k -s '$url'");
+    while(<CSV>) {
+      chomp;
+      next if /^#/;
+      my ($appid, $rdate, $call, $vanity, $pred) = split /,/;
+      print "error: expecting $c but found $vanity\n" if $vanity ne $c;
+      next if $appid ~~ @seenApps;
+      push @seenApps, $appid;
+      $sum += $pred;
+      #print "$c += $pred = $sum\n";
+    }
+    close(CSV);
+    $regionPreds{$c} = $sum;
+    #print "$c => $sum\n";
+  }
+
+  print "Region $region: ", green(scalar @avail), " available";
+
+  if (scalar @avail > 0) {
+    #print ": ", green(join(", ", @avail));
+    my $num = 0;
+    print ": ";
+    foreach my $c (@avail) {
+      print green($c);
+      print yellow(" ($regionPreds{$c}%)") # \
+	if defined $regionPreds{$c} and $regionPreds{$c} > 0.0;
+      print ", " unless ++$num == scalar @avail;
+    }
+}
+
+  print "; ", lightblue(scalar @pending), " pending";
+
+  if (scalar @pending > 0) {
+    my $num = 0;
+    print ": ";
+    foreach my $c (@pending) {
+      print lightblue($c);
+      print yellow(" ($regionPreds{$c}%)") # \
+	if defined $regionPreds{$c} and $regionPreds{$c} < 99.5; # allow for rounding
+      print ", " unless ++$num == scalar @pending;
+    }
+    #print ": ", lightblue(join(", ", @pending)) if scalar @pending > 0;
+  }
+
+  print "; ", yellow(scalar @upcoming), " upcoming";
+  print ": ", yellow(join(", ", @upcoming)) if scalar @upcoming > 0;
+  print "; ", red(scalar @unavail), " unavailable: ",
+	red(join(", ", @unavail)) if scalar @unavail > 0;
+  print "\n";
+  $_ = $saved;
+}
+
+sub doAe7qCall {
+  my $call = uc shift;
+  my $saved = $_;
+
+  my ($frn, $name, $class, $status, $state, $grant, $eff, $cxl, $expire);
+  my $availdate;
+  my ($receipt, $process, $appl, $filenum, $type, $seq, $pred);
+  my $callStatus;
+  my $inLicTable = 0;
+  my $inPredTable = 0;
+  my $pending = 0;
+  my $found = 0;
+  my @frns;
+  my %odds_sim;
+
+  #  print "Note: ae7q.com is not providing full data after changes on the site. See https://www.ae7q.com/query/text/News.php\n";
+
+  my $url = "${predictionBaseUrl}/vanity-$call.csv";
+  open(CSV, '-|', "curl --fail --max-time $ae7qTimeout -L -k -s '$url'");
+  while(<CSV>) {
+    chomp;
+    next if /^#/;
+    my ($appid, undef, undef, $vanity, $pred) = split /,/;
+    $odds_sim{"${appid}_$vanity"} = $pred;
+  }
+  close(CSV);
+
+  $url = "${predictionBaseUrl}/call-$call.csv";
+  open(CSV, '-|', "curl --fail --max-time $ae7qTimeout -L -k -s '$url'");
+  while(<CSV>) {
+    chomp;
+    next if /^#/;
+    my ($appid, undef, undef, $vanity, $pred) = split /,/;
+    $odds_sim{"${appid}_$vanity"} = $pred;
+  }
+  close(CSV);
+
+  $url = "http://www.ae7q.com/query/data/CallHistory.php?CALL=$call";
+  open(HTTP, '-|', "curl --max-time $ae7qTimeout -L -k -s '$url'");
+  while(<HTTP>) {
+    $inLicTable = 1 if m|<table class='Database' cellpadding='4' align='center'><tbody class='Database'>|;
+    if ($inLicTable and m|title='Show licensee FRN history for (\d+)'>(.*)</a></td>|) {
+      ($frn, $name) = ($1, $2);
+    }
+    if (m|<kbd>$call</kbd> is (. - )?canceled, but is not yet|) {
+      $callStatus = red("Canceled, but not yet available");
+    }
+    if (m|<kbd>$call</kbd> is (. - )?expired, but is not yet|) {
+      $callStatus = red("Expired, but not yet available");
+    }
+    if (m|<kbd>$call</kbd> is reserved \((.*?)\)|) {  # example: KA2ZU
+      $callStatus = red("Reserved ($1)");
+    }
+    if (m|style='background-color:#99CCFF; '><kbd>$call</kbd> is (. - )?(expired\|canceled) and is <|) {
+      $callStatus = lightblue("Application Pending");
+      $pending = 1;
+    }
+    if (m|style='background-color:#99FF66; '><kbd>$call</kbd> is (. -)?\s*(expired\|canceled) and is <|) {
+      $callStatus = green("Available");
+    }
+    if (m|style='background-color:#99FF66; '><kbd>$call</kbd> is  <|) {
+      $callStatus = green("Available");
+    }
+    if (m|style='background-color:#99CCFF; '><kbd>$call</kbd> is  <|) {
+      $callStatus = lightblue("Application Pending");
+      $pending = 1;
+    }
+    if ($inLicTable) {
+      if (/^<td class='Database'>(. - )?(Technician|General|Amateur Extra|Novice|Advanced)<\/td>$/) {
+	$class = $2;
+      }
+      if (/^<td class='Database' style='background-color:#[0-9A-F]+;\s*'>(. - )?(Canceled|Active|Expired)<\/td>$/) {
+	$status = $2;
+      }
+      if (m|> / ([A-Z]{2})</td>|) {
+	$state = $1;
+      }
+      if (m|href='/query/list/ProcessDate.php\?DATE=([0-9-]+)'|){
+	$grant = $1;
+      }
+      if (m|title='Show callsign detail for [A-Z0-9]+'>([0-9-]+)</a>|) {
+	$eff = $1;
+      }
+      if (m|<td class='Database'> ([0-9-]*)&nbsp;</td>|) {
+	if (not defined $cxl) {
+	  $cxl = $1;
+	} else {
+	  $expire = $1;
+	}
+      }
+      if (m|</tr>| and defined $name) {
+	$availdate = getAvailDate($expire, $cxl);
+	$callStatus = green("Active")
+	  if not defined $callStatus and $status eq "Active";
+	print bold($call), ": ";
+	print $callStatus if defined $callStatus;
+	print " - previous licensee:" if $status ne "Active";
+	print " - $name (FRN $frn; $state) - ";
+	print "$class - " if defined $class and length($class) > 0;
+
+	print "Status: ";
+	print green($status) if $status eq "Active";
+	print red($status) if $status eq "Expired";
+	print yellow($status) if $status eq "Canceled";
+
+	print " - Grant $grant; Effective $eff; ";
+	print "Cancel $cxl; " if defined $cxl and length($cxl) > 0;
+	print "Expire $expire";
+	print italic("; Avail $availdate") if defined $availdate;
+	print "\n";
+	push(@frns, $frn) if defined $frn and $status eq "Active";
+	$name = $frn = $class = $status = $grant = $eff = $cxl = $expire = undef;
+	$found = 1;
+	$inLicTable = 0;
+      }
+      $inLicTable = 0 if />Callsign</; # for trustee section
+    }
+    if (m|^\s*<table class="Database" cellpadding="4" align="center">\s*$|) {
+      print bold($call), ": $callStatus\n" if defined $callStatus and not $found;
+      $found = 1;
+      $inPredTable = 1;
+      $state = $class = undef;
+      #print "----\n";
+    }
+    if ($inPredTable) {
+      if (m|</tr>| and defined $filenum) {
+	#print "$receipt $process $appl $class $state $filenum $seq $pred\n";
+	#printf "%-6s ($state) $seq $pred\n", $appl;
+	my $odds = formatOdds($odds_sim{"${filenum}_$call"});
+	printf "$receipt -> $process %-6s ($state) App $filenum #%-5s $pred%s\n", $appl, $seq, $odds;
+	$filenum = $seq = $pred = undef;
+      }
+      if (m|<td class="DatabaseField" style='background-color:White; Text-Align: right'><a href='/query/list/AppByReceipt.php\?DATE=([0-9-]+)' title='Show vanity applications received on [0-9-]+'>\w+ [0-9-]+</a></td><td class="DatabaseField" style='background-color:.*?; Text-Align: right'><a href='/query/list/ProcessDate.php\?DATE=([0-9-]+)' title='Show application &amp; license processing for [0-9-]+'>\w+ [0-9-]+</a></td>|) {
+	($receipt, $process) = ($1, $2);
+      }
+      if (m|<td class="DatabaseField" style='background-color:White; Text-Align: right'><a href='/query/list/AppByReceipt.php\?DATE=([0-9-]+)' title='Show vanity applications received on [0-9-]+'>\w+ [0-9-]+</a>.*Offlined by FCC|) {
+	($receipt, $process) = ($1, "????-??-??");
+      }
+      if (m/<kbd\s+style='font-weight:(Normal|Bold)'>([A-Z0-9]+)<\/kbd><\/a><\/td>/) {
+	$appl = $2;
+      }
+      if (m/<td class="DatabaseField">(Technician|General|Amateur Extra|Novice|Advanced)&nbsp;<\/td>/) {
+	$class = $1;
+      }
+      if (m|</a> / ([A-Z]+)</td>|) {
+	$state = $1;
+      }
+      if (m|href='/query/data/AppDetail.php\?UFN=(\d+)'|) {
+	$filenum = $1;
+      }
+      if (m|<td class='DatabaseField' align='right'> (\d+/\d+)</td>|) {
+	$seq = $1;
+      }
+      if (m|href='/query/list/Prediction.php\?PREDICT=(.*?)'|) {
+	$pred = $1;
+	$pred =~ s/_/ /g;
+	$pred = green($pred) if $pred eq "Assignment";
+	$pred = lightblue($pred) if $pred =~ /^(Competition|Available)/;
+	$pred = italic($pred) if $pred =~ /^Unneeded/;
+	$pred = yellow($pred) if $pred =~ /^Offlined/;
+	$pred = red($pred) if $pred =~ /^(Too|Not|Invalid|Insuff|Restricted|Active|Duplic|Reserv|Inactive)/;
+      }
+      if (m|</table>|) {
+	$inPredTable = 0;
+      }
+    }
+  }
+  close(HTTP);
+
+  foreach my $f (@frns) {
+    printFrnApps($f, \%odds_sim);
+  }
+
+  print bold($call), ": $callStatus\n" if defined $callStatus and not $found;
+  $_ = $saved;
+}
+
+sub getAvailDate {
+  my $exp = shift;
+  my $cxl = shift;
+
+  return undef if not defined $exp or $exp eq "";
+
+  # convert from localtime in washington
+  $ENV{TZ} = "EST5EDT";
+  my ($y, $m, $d) = split('-', $exp);
+  my $expdate = timelocal(0, 0, 0, $d, $m-1, $y+2);
+  #print "exp: $exp $expdate\n";
+  $expdate += (24 * 60 * 60);
+
+  my $cxldate = 9999999999;
+  if (defined $cxl and length($cxl) > 0) {
+    ($y, $m, $d) = split('-', $cxl);
+    $cxldate = timelocal(0, 0, 0, $d, $m-1, $y+2);
+    #print "cxl: $cxl $cxldate\n";
+    $cxldate += (24 * 60 * 60);
+  }
+
+  my $availdate = min($expdate, $cxldate);
+  my $format = "%Y-%m-%d";
+  $format = bold($format) if $availdate <= time() + (24*60*60*31);
+
+  return strftime($format, localtime($availdate))
+}
+
+sub uniq {
+  my %seen;
+  grep !$seen{$_}++, @_;
+}
+
+sub printFrnApps {
+  my $frn = shift;
+  my $odds_sim = shift;
+  my $saved = $_;
+  my $url = "http://ae7q.com/query/data/FrnHistory.php?FRN=$frn";
+  my $inpred = 0;
+  my ($appdate, $procdate, $appid, $appidnum, $appcolor, $type, $seqnum, $vanity, $pred);
+  open(HTTP, '-|', "curl --max-time $ae7qTimeout -L -k -s '$url'");
+  while(<HTTP>) {
+    $inpred = 1 if /Retrieving predictions for pending applications from/;
+
+    $appdate = $1 if m|/AppByReceipt\.php\?DATE=([0-9-]+)'| and $inpred == 1;
+    $procdate = $1 if m|/ProcessDate\.php\?DATE=([0-9-]+)'| and $inpred == 1;
+    # <td class="DatabaseField" style='background-color:#99CCFF; '><a href='/query/data/AppDetail.php?UFN=0009052785'
+    if (m|background-color:#([0-9A-F]+).*/AppDetail\.php\?UFN=([0-9]+)'| and $inpred == 1) {
+      $appidnum = $appid = $2;
+      my $appcolor = $1;
+      $appid = lightblue($appid) if $appcolor eq "99CCFF";
+      $appid = green($appid) if $appcolor eq "99FF66";
+      $appid = yellow($appid) if $appcolor eq "FFFF66";
+      $appid = red($appid) if $appcolor eq "FF99CC";
+    }
+    $type = $2 if m|/AppByType.*>(. - )?([^<]*)</a>| and $inpred == 1;
+    $seqnum = $1 if m|<td class='DatabaseField' align='right'>\s*([0-9]+)\s*</td>| and $inpred == 1;
+    $vanity = $1 if m|/CallHistory\.php\?CALL=([0-9A-Z]+)#Apps| and $inpred == 1;
+    if (m|background-color:#([0-9A-F]+);.*/Prediction\.php\?PREDICT=(.*?)'| and $inpred == 1) {
+      $pred = $2;
+      $pred =~ s/_/ /g;
+      $pred = green($pred) if $pred eq "Assignment";
+      $pred = lightblue($pred) if $pred =~ /^(Competition|Available)/;
+      $pred = italic($pred) if $pred =~ /^Unneeded/;
+      $pred = yellow($pred) if $pred =~ /^Offlined/;
+      $pred = red($pred) if $pred =~ /^(Too|Not|Invalid|Insuff|Restricted|Active|Duplic|Reserv|Inactive)/;
+
+      $procdate = "????-??-??" if not defined $procdate or $pred =~ /^Offlined/;
+
+      my $odds = formatOdds($odds_sim->{"${appidnum}_$vanity"});
+      print "$appdate -> $procdate: App $appid ($type) #$seqnum $vanity $pred$odds\n";
+    }
+  }
+  $_ = $saved;
+}
+
+sub formatOdds {
+  my $odds = shift;
+  if (not defined $odds) {
+    $odds = "";
+  } else {
+    if (isNumeric($odds) and $odds == 100.0) {
+      $odds = green(" 100%");
+    } elsif (isNumeric($odds) and $odds == 0.0) {
+      $odds = red(" 0%");
+    } else {
+      $odds = yellow(" $odds%");
+    }
+  }
+  return $odds;
+}
+
+sub getDaysInMonth {
+  my $m = shift;
+  my $y = shift;
+  return undef if not isNumeric($m) or not isNumeric($y);
+  if ($m == 9 or $m == 4 or $m == 6 or $m == 11) {
+    return 30;
+  }
+  if ($m != 2) {
+    return 31;
+  }
+  if ($y % 4 != 0) {
+    return 28;
+  }
+  if ($y % 100 != 0) {
+    return 29;
+  }
+  if ($y % 400 == 0) {
+    return 29;
+  } else {
+    return 28;
+  }
+}
+
+sub assert {
+  my ($condition, $msg) = @_;
+  return if $condition;
+  if (!$msg) {
+    my ($pkg, $file, $line) = caller(0);
+    open my $fh, "<", $file;
+    my @lines = <$fh>;
+    close $fh;
+    $msg = "$file:$line: " . $lines[$line - 1];
+  }
+  die "Assertion failed: $msg";
+}
+
+sub testDaysInMonth {
+  # 1988, 1992, and 1996 are leap years.
+  assert(getDaysInMonth(2, 1988) == 29);
+  assert(getDaysInMonth(2, 1992) == 29);
+  assert(getDaysInMonth(2, 1996) == 29);
+  assert(getDaysInMonth(2, 2004) == 29);
+  # the following years are not leap years:
+  # 1700, 1800, 1900, 2100, 2200, 2300, 2500, 2600
+  assert(getDaysInMonth(2, 1700) == 28);
+  assert(getDaysInMonth(2, 1800) == 28);
+  assert(getDaysInMonth(2, 1900) == 28);
+  assert(getDaysInMonth(2, 2100) == 28);
+  assert(getDaysInMonth(2, 2200) == 28);
+  assert(getDaysInMonth(2, 2300) == 28);
+  assert(getDaysInMonth(2, 2500) == 28);
+  assert(getDaysInMonth(2, 2600) == 28);
+  # The following years are leap years: 1600, 2000, 2400
+  assert(getDaysInMonth(2, 1600) == 29);
+  assert(getDaysInMonth(2, 2000) == 29);
+  assert(getDaysInMonth(2, 2400) == 29);
+  # all others
+  assert(getDaysInMonth(2, 2001) == 28);
+}
