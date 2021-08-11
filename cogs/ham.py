@@ -189,6 +189,27 @@ class ham(commands.Cog, name="ham"):
         else:
             await context.send(outputtext)
 
+    @commands.command(name="phonetics", aliases=["phoneticize", "phoneticise"])
+    async def phonetics(self, context, *, args):
+        """
+        Usage: !phonetics <message> - Convert input text to random and sometimes humorous phonetics.
+        """
+        cleanargs=re.sub(r'[^A-Za-z0-9 ]+','', args)
+        outputtext=""
+        phlist=[]
+        with open("/usr/share/dict/words") as file:
+            phlist = file.readlines()
+            for char in cleanargs:
+                if char==" ":
+                    pass
+                elif char.isnumeric():
+                    outputtext += f"{char} "
+                else:
+                    choices = [x.rstrip() for x in phlist if x.startswith(char)]
+                    outputtext += random.choice(choices).replace("\'s","")
+                    outputtext += " "
+        await context.send(outputtext)
+
     @commands.command(name="qrz", aliases=["call","lookup","dox"])
     async def qrz(self, context, *, args):
         """
@@ -232,7 +253,7 @@ class ham(commands.Cog, name="ham"):
 #            url = f"https://xmldata.qrz.com/xml/current/?s={sessionkey};callsign={cleanargs.upper()}"
 #            raw_response = await session.get(url)
 #            response = await raw_response.text()
-        response=subprocess.check_output(f"./qrz --xml {callsign}",shell=True)
+        response=subprocess.check_output(f"qrz --xml {callsign}",shell=True)
         response=xmltodict.parse(response)
         print(response)
         if redditor==1:

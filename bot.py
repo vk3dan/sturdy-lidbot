@@ -56,7 +56,7 @@ intents.members = True
 intents = discord.Intents.default()
 intents.members = True
 
-ser_pref={'845344210231623690':'?','821167263566528562':'.'}
+ser_pref={'845344210231623690':'?'}
 def get_prefix(bot, msg):	
 	if str(msg.guild.id) in ser_pref:
 		return ser_pref[str(msg.guild.id)]
