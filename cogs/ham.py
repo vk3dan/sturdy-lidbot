@@ -6,6 +6,7 @@ from discord.ext import commands
 from geopy.geocoders import GoogleV3
 from geopy.distance import geodesic
 from dateutil import tz
+#from bot import get_prefix
 import urllib.parse
 if not os.path.isfile("config.py"):
     sys.exit("'config.py' not found! Please add it and try again.")
@@ -710,7 +711,7 @@ class ham(commands.Cog, name="ham"):
                     await webhook.delete()
                     await context.message.delete()
                 else:
-                    await context.send(embed=embed)
+                    await context.send(f"```{response}```")
             except:
                 embed=discord.Embed(
                     title=f":warning: AE7Q error:",
@@ -720,7 +721,7 @@ class ham(commands.Cog, name="ham"):
                 await context.send(embed=embed)
                 return 1
 
-    @commands.command(name="iono")
+    @commands.command(name="iono", aliases=["muf"])
     async def iono(self, context, *, args=""):
         """
             Returns ionospheric data for nearest location or you can specify a location with a grid square
@@ -808,6 +809,54 @@ class ham(commands.Cog, name="ham"):
             await context.message.delete()
         else:
             await context.send(embed=embed)
+
+    @commands.command(name="spots")
+    async def iono(self, context, *, args=""):
+        """
+            Usage: !spots <CALLSIGN>
+            Returns a list of 5 most recent spots for the given callsign.
+        """
+        if len(args)==0:
+            embed=discord.Embed(
+                    title=f":warning: spots error:",
+                    description=f"Callsign not provided.\nUsage: {str(self.bot.command_prefix('',context.message))}spots <callsign>",
+                    color=0xFF0000
+            )
+            await context.send(embed=embed)
+            return 1
+        cleanargs=re.sub(r'[^A-Za-z0-9]+','', args)
+        try:
+            response=subprocess.check_output(f"./qrmbot/spots {cleanargs} 5",shell=True)
+            response=response.decode('utf-8')
+            print (f"Spots lookup for {cleanargs.upper()}")
+            if response.startswith("no spots found for"):
+                raise ValueError('no spots found')
+            if not isinstance(context.message.channel, discord.channel.DMChannel):
+                webhook = await context.channel.create_webhook(name="lidstuff")
+                await webhook.send(f"```{response}```", username=context.message.author.display_name, avatar_url=context.message.author.avatar_url)
+                await webhook.delete()
+                await context.message.delete()
+            else:
+                await context.send(f"```{response}```")
+            return 0
+        except ValueError as err:
+            print(f"Error: {err}")
+            embed=discord.Embed(
+                title=f":warning: spots error:",
+                description=f"No spots found for callsign {cleanargs.upper()}",
+                color=0xFF0000
+            )
+            await context.send(embed=embed)
+            return 1
+        except:
+            embed=discord.Embed(
+                title=f":warning: spots error ({cleanargs.upper()}):",
+                description=f"Lookup of spots failed. Please check callsign or try again later.\nUsage: {str(self.bot.command_prefix('',context.message))}spots <callsign>",
+                color=0xFF0000
+            )
+            await context.send(embed=embed)
+            return 1
+
 
     async def geocode(self, location):
         geo = GoogleV3(api_key=config.GOOGLEGEO_API_KEY, user_agent="lidbot")

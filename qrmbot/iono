@@ -1,0 +1,152 @@
+#!/usr/bin/perl
+# get ionospheric data
+#
+# 2-clause BSD license.
+# Copyright (c) 2019, 2020 molo1134@github. All rights reserved.
+
+use strict;
+use utf8;
+use Encode qw(decode);
+use feature 'unicode_strings';
+binmode(STDOUT, ":utf8");
+
+use File::Basename;
+use Cwd 'realpath';
+use lib dirname(realpath(__FILE__));
+use Colors;
+use Location;
+
+use Math::Round;
+use Time::Piece ();
+use POSIX qw(floor);
+use POSIX qw(strftime);
+
+@ARGV = map { decode "utf-8", $_ } @ARGV;
+# eggdrop doesn't split args on spaces
+@ARGV=split(' ', join(' ',@ARGV));
+
+my $username = $ENV{'USER'} || $ENV{'USERNAME'} || getpwuid($<);
+# change this to 0 to always exit with success
+our $exitnonzeroonerror = 1;
+$exitnonzeroonerror = 0 if $username eq 'eggdrop';
+
+my $geo = undef;
+my $query = undef;
+
+my $i = 0;
+while ($i <= $#ARGV) {
+  if (!defined($geo) and $ARGV[$i] =~ /^--geo$/i) {
+    $i++;
+    $geo = $ARGV[$i];
+    $i++;
+    next;
+  }
+  if (defined($query)) {
+    $query = $query ." ". $ARGV[$i];
+  } else {
+    $query = $ARGV[$i];
+  }
+  $i++;
+}
+
+if (not defined $query and not defined $geo) {
+  if ($username eq 'eggdrop') {
+    print "usage: !iono <grid>|<lat>,<lon>|<qth>\n";
+  } else {
+    print "usage: $0 <grid>|<lat>,<lon>|<qth>\n";
+  }
+  exit $exitnonzeroonerror;
+}
+
+my $result = argToCoords($query) if defined $query;
+
+if (defined $query and not defined $result) {
+  print "error: unable to find \"$query\"\n";
+  exit $exitnonzeroonerror;
+}
+
+my ($mylat, $mylon) = split(',', $geo) if defined $geo;
+($mylat, $mylon) = split(',', $result) if defined $result;
+
+#print "$mylat, $mylon\n";
+
+my $url = "https://prop.kc2g.com/api/stations.json";
+my $timeout = 10;	# 10 seconds
+
+my ($fof2, $mufd, $md, $code, $name, $lat, $lon, $ts, $cs);
+my %result;
+
+open (JSON, '-|', "curl -s -k -L --max-time $timeout --retry 1 \"${url}\" | jq -M .");
+while (<JSON>) {
+  if (/^\s*{$/) {
+    if (defined $code) {
+      if ((not defined $cs or ($cs > 20)) and					    # confidence score > 20
+	  ((defined $mufd and $mufd > 0.0) or (defined $fof2 and $fof2 > 0.0)) and  # need either MUF or FoF2
+	  (defined $ts and $ts > (time() - 3600)) and				    # updated in the last hour
+	  $code ne "WI937") {							    # station only gives fof2, but WP937 gives both
+	$lon = $lon - 360.0 if defined $lon and $lon > 180;
+	my ($dist, $bearing) = distBearing($mylat, $mylon, $lat, $lon);
+	#print "Adding $code $name $fof2 $mufd $lat,$lon $dist $bearing\n";
+	$result{$code} = join("^^", ($fof2, $mufd, $md, $code, $name, $lat, $lon, $ts, $cs, $dist, $bearing));
+      } else {
+	#print "Discarding $code $name age:", time()-$ts, " CS:$cs MUF(D):$mufd FoF2:$fof2\n";
+      }
+    }
+    ($fof2, $mufd, $md, $code, $name, $lat, $lon, $ts, $cs) = (undef, undef, undef, undef, undef, undef, undef, undef, undef);
+  }
+  if (/"(\w+)": (".*"|null|[0-9.-]+)/) {
+    my ($k, $v) = ($1, $2);
+    $v =~ s/^"(.*)"$/$1/;
+    #print "$k ==> $v\n";
+    $v = undef if $v eq "null" or $v eq "" or $v == -1;
+
+    $fof2 = nearest(0.001, $v) if $k eq "fof2" and defined $v;
+    $mufd = nearest(0.001, $v) if $k eq "mufd" and defined $v;
+    $md = nearest(0.001, $v) if $k eq "md" and defined $v;
+    $code = $v if $k eq "code";
+    $name = $v if $k eq "name";
+    $lat = $v if $k eq "latitude";
+    $lon = $v if $k eq "longitude";
+    $cs = $v if $k eq "cs";
+    if ($k eq "time") {
+      $ENV{TZ} = "UTC";
+      $ts = Time::Piece->strptime($v, "%Y-%m-%dT%H:%M:%S+00:00")->epoch;
+    }
+  }
+}
+close(JSON);
+
+#print "results: ", scalar %result, "\n";
+
+my $mindist = 20000.0;
+my $closest = undef;
+foreach my $s (keys %result) {
+  #print "result: $result{$s}\n";
+  my ($fof2, $mufd, $md, $code, $name, $lat, $lon, $ts, $cs, $dist, $bearing) =
+    split(/\^\^/,$result{$s});
+  if ($dist < $mindist) {
+    $closest = $s;
+    $mindist = $dist;
+  }
+}
+
+if (not defined $closest) {
+  print "error: no stations found\n";
+  exit $exitnonzeroonerror;
+}
+
+my ($fof2, $mufd, $md, $code, $name, $lat, $lon, $ts, $cs, $dist, $bearing) =
+  split(/\^\^/,$result{$closest});
+
+my $grid = substr(coordToGrid($lat, $lon), 0, 4);
+my $old = "";
+$old = yellow(" [old]") if $ts < (time() - (30*60));  # 30 min
+$old = red(" [old]") if $ts < (time() - (120*60));    # 2 hour
+
+print bold($name), " ($grid ", floor($dist), " km ", azToNEWS($bearing),") @ ", strftime("%Y-%m-%d %H%Mz", gmtime($ts)), "$old: ";
+print bold("MUF $mufd MHz") if length $mufd > 0 and $mufd > 0.0;
+print ", " if length $mufd > 0 and $mufd > 0.0 and length $fof2 > 0 and $fof2 > 0.0;
+print "FoF2 $fof2 MHz" if length $fof2 > 0 and $fof2 > 0.0;
+print " with M(D) ${md}x" if length $fof2 > 0 and $fof2 > 0.0 and length $md > 0;
+print "\n";
+

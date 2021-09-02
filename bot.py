@@ -58,9 +58,9 @@ intents.members = True
 
 ser_pref={'845344210231623690':'?'}
 def get_prefix(bot, msg):	
-	if str(msg.guild.id) in ser_pref:
+	try:
 		return ser_pref[str(msg.guild.id)]
-	else:
+	except:
 	    return config.BOT_PREFIX
 
 bot = Bot(command_prefix=get_prefix, intents=intents, case_insensitive=True)
