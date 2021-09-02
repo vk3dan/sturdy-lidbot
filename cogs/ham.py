@@ -16,6 +16,94 @@ class ham(commands.Cog, name="ham"):
     def __init__(self, bot):
         self.bot = bot
 
+    @commands.command(name="iono", aliases=["muf"])
+    async def iono(self, context, *, args=""):
+        """
+            Returns ionospheric data for nearest location or you can specify a location with a grid square
+        """
+        if len(args)==0:
+            try:
+                user=str(context.message.author.id)
+                qthfile="resources/locations.json"
+                justincaseempty=open(qthfile,"a")
+                justincaseempty.close
+                coords=[]
+                with open(qthfile,"r") as qthjson:
+                    try:
+                        data = json.loads(qthjson.read())
+                        try:
+                            print(data[user])
+                            coords = data[user]
+                        except:
+                            pass
+                    except:
+                        pass
+                if coords:
+                    locator=maidenhead.to_maiden(lat=coords[0], lon=coords[1])
+            except:
+                embed=discord.Embed(
+                    title=f":warning: iono error:",
+                    description=f"Location not provided and user has no saved location.",
+                    color=0xFF0000
+                )
+                await context.send(embed=embed)
+                return 1
+        elif re.match("[a-zA-Z][a-zA-Z][0-9]+", args):
+            locator=args
+        else:
+            embed=discord.Embed(
+                title=f":warning: iono error:",
+                description=f"Location not provided as maidenhead locator.",
+                color=0xFF0000
+            )
+            await context.send(embed=embed)
+            return 1
+        response=subprocess.check_output(f"./qrmbot/iono {locator}",shell=True)
+        response=response.decode('utf-8')
+        print (response)
+        splitresponse=response.split(':')
+        station=splitresponse[0].split('@')[0]
+        muftime = splitresponse[0].split('@')[1]
+        values=re.findall(r'\d+\.\d+',splitresponse[1])
+        muf3000=values[0]
+        foF2=values[1]
+        md=values[2]
+        embed=discord.Embed(
+            title=f"iono lookup: {locator}",
+            color=0x00FF00
+        )
+        embed.add_field(
+            name="Station:",
+            value=station,
+            inline=True
+        )
+        embed.add_field(
+            name="Date/Time:",
+            value=muftime,
+            inline=False
+        )
+        embed.add_field(
+            name="MUF(3000):",
+            value=f"{muf3000} MHz",
+            inline=True
+        )
+        embed.add_field(
+            name="foF2:",
+            value=f"{foF2} MHz",
+            inline=True
+        )
+        embed.add_field(
+            name="M(D):",
+            value=f"{md}x",
+            inline=True
+        )
+        if not isinstance(context.message.channel, discord.channel.DMChannel):
+            webhook = await context.channel.create_webhook(name="lidstuff")
+            await webhook.send(embed=embed, username=context.message.author.display_name, avatar_url=context.message.author.avatar_url)
+            await webhook.delete()
+            await context.message.delete()
+        else:
+            await context.send(embed=embed)
 
     @commands.command(name="bands")
     async def bands(self, context):
@@ -636,7 +724,7 @@ class ham(commands.Cog, name="ham"):
                 await context.send(embed=embed)
 
     @commands.command(name="spots", aliases=["spot"])
-    async def iono(self, context, *, args=""):
+    async def spots(self, context, *, args=""):
         """
             Usage: !spots <CALLSIGN>
             Returns a list of 5 most recent spots for the given callsign.
@@ -671,7 +759,7 @@ class ham(commands.Cog, name="ham"):
                 color=0xFF0000
             )
             await context.send(embed=embed)
-            return 1
+            return 2
         except:
             embed=discord.Embed(
                 title=f":warning: spots error ({cleanargs.upper()}):",
@@ -682,94 +770,6 @@ class ham(commands.Cog, name="ham"):
             return 1
         return 0
 
-    @commands.command(name="iono", aliases=["muf"])
-    async def iono(self, context, *, args=""):
-        """
-            Returns ionospheric data for nearest location or you can specify a location with a grid square
-        """
-        if len(args)==0:
-            try:
-                user=str(context.message.author.id)
-                qthfile="resources/locations.json"
-                justincaseempty=open(qthfile,"a")
-                justincaseempty.close
-                coords=[]
-                with open(qthfile,"r") as qthjson:
-                    try:
-                        data = json.loads(qthjson.read())
-                        try:
-                            print(data[user])
-                            coords = data[user]
-                        except:
-                            pass
-                    except:
-                        pass
-                if coords:
-                    locator=maidenhead.to_maiden(lat=coords[0], lon=coords[1])
-            except:
-                embed=discord.Embed(
-                    title=f":warning: iono error:",
-                    description=f"Location not provided and user has no saved location.",
-                    color=0xFF0000
-                )
-                await context.send(embed=embed)
-                return 1
-        elif re.match("[a-zA-Z][a-zA-Z][0-9]+", args):
-            locator=args
-        else:
-            embed=discord.Embed(
-                title=f":warning: iono error:",
-                description=f"Location not provided as maidenhead locator.",
-                color=0xFF0000
-            )
-            await context.send(embed=embed)
-            return 1
-        response=subprocess.check_output(f"./qrmbot/iono {locator}",shell=True)
-        response=response.decode('utf-8')
-        print (response)
-        splitresponse=response.split(':')
-        station=splitresponse[0].split('@')[0]
-        muftime = splitresponse[0].split('@')[1]
-        values=re.findall(r'\d+\.\d+',splitresponse[1])
-        muf3000=values[0]
-        foF2=values[1]
-        md=values[2]
-        embed=discord.Embed(
-            title=f"iono lookup: {locator}",
-            color=0x00FF00
-        )
-        embed.add_field(
-            name="Station:",
-            value=station,
-            inline=True
-        )
-        embed.add_field(
-            name="Date/Time:",
-            value=muftime,
-            inline=False
-        )
-        embed.add_field(
-            name="MUF(3000):",
-            value=f"{muf3000} MHz",
-            inline=True
-        )
-        embed.add_field(
-            name="foF2:",
-            value=f"{foF2} MHz",
-            inline=True
-        )
-        embed.add_field(
-            name="M(D):",
-            value=f"{md}x",
-            inline=True
-        )
-        if not isinstance(context.message.channel, discord.channel.DMChannel):
-            webhook = await context.channel.create_webhook(name="lidstuff")
-            await webhook.send(embed=embed, username=context.message.author.display_name, avatar_url=context.message.author.avatar_url)
-            await webhook.delete()
-            await context.message.delete()
-        else:
-            await context.send(embed=embed)
 
     @commands.command(name="ae7q", aliases=["available"])
     async def ae7q(self, context, *, args):
