@@ -135,7 +135,7 @@ async def on_message(message):
 			elif "penguin" in message.content.lower() or "🐧" in message.content:
 				webhook = await message.channel.create_webhook(name="lidstuff")
 				penguinquote, penguinnick = random.choice(list(penguins.items()))
-				await webhook.send(penguinquote, username=penguinnick)
+				await webhook.send(penguinquote, username=penguinnick, avatar_url="http://clipart-library.com/image_gallery2/Penguin-PNG-Picture.png")
 				await webhook.delete()
 			await bot.process_commands(message)
 		else:

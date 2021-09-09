@@ -309,7 +309,6 @@ class general(commands.Cog, name="general"):
         headers={'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:61.0) Gecko/20100101 Firefox/61.0'}
         async with aiohttp.ClientSession(connector=aiohttp.TCPConnector(ssl=False),headers=headers) as session:
             raw_response = await session.get(url)
-            print(raw_response)
             response = await raw_response.text()
             response = json.loads(response)
             embed = discord.Embed(
